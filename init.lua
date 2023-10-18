@@ -58,7 +58,7 @@ require('lazy').setup({
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim', opts = {} },
+  { 'folke/which-key.nvim',  opts = {} },
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -168,8 +168,13 @@ require('lazy').setup({
     opts = {
       hint_prefix = '',
     },
-    config = function(_, opts) require'lsp_signature'.setup(opts) end
-  }
+    config = function(_, opts) require 'lsp_signature'.setup(opts) end
+  },
+  {
+    'windwp/nvim-autopairs',
+    event = "InsertEnter",
+    opts = {}
+  },
 }, {})
 
 vim.o.hlsearch = false
@@ -222,9 +227,13 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz")
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
 vim.keymap.set("x", "<leader>p", [["_dP]])
-vim.keymap.set({"n", "v"}, "<leader>y", [["+y]])
-vim.keymap.set({"n", "v"}, "<leader>d", [["_d]])
+vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])
+vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]])
 vim.keymap.set("n", "<leader>sw", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
+
+-- trying to format doc on save
+vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
+
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
@@ -277,7 +286,8 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim', 'bash' },
+    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim',
+      'bash' },
 
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
     auto_install = false,
@@ -425,79 +435,79 @@ local servers = {
   intelephense = {
     intelephense = {
       stubs = {
-        				"apache",
-				"bcmath",
-				"bz2",
-				"calendar",
-				"com_dotnet",
-				"Core",
-				"ctype",
-				"curl",
-				"date",
-				"dba",
-				"dom",
-				"enchant",
-				"exif",
-				"FFI",
-				"fileinfo",
-				"filter",
-				"fpm",
-				"ftp",
-				"gd",
-				"gettext",
-				"gmp",
-				"hash",
-				"iconv",
-				"imap",
-				"intl",
-				"json",
-				"ldap",
-				"libxml",
-				"mbstring",
-				"meta",
-				"mysqli",
-				"oci8",
-				"odbc",
-				"openssl",
-				"pcntl",
-				"pcre",
-				"PDO",
-				"pdo_ibm",
-				"pdo_mysql",
-				"pdo_pgsql",
-				"pdo_sqlite",
-				"pgsql",
-				"Phar",
-				"posix",
-				"pspell",
-				"readline",
-				"Reflection",
-				"session",
-				"shmop",
-				"SimpleXML",
-				"snmp",
-				"soap",
-				"sockets",
-				"sodium",
-				"SPL",
-				"sqlite3",
-				"standard",
-				"superglobals",
-				"sysvmsg",
-				"sysvsem",
-				"sysvshm",
-				"tidy",
-				"tokenizer",
-				"xml",
-				"xmlreader",
-				"xmlrpc",
-				"xmlwriter",
+        "apache",
+        "bcmath",
+        "bz2",
+        "calendar",
+        "com_dotnet",
+        "Core",
+        "ctype",
+        "curl",
+        "date",
+        "dba",
+        "dom",
+        "enchant",
+        "exif",
+        "FFI",
+        "fileinfo",
+        "filter",
+        "fpm",
+        "ftp",
+        "gd",
+        "gettext",
+        "gmp",
+        "hash",
+        "iconv",
+        "imap",
+        "intl",
+        "json",
+        "ldap",
+        "libxml",
+        "mbstring",
+        "meta",
+        "mysqli",
+        "oci8",
+        "odbc",
+        "openssl",
+        "pcntl",
+        "pcre",
+        "PDO",
+        "pdo_ibm",
+        "pdo_mysql",
+        "pdo_pgsql",
+        "pdo_sqlite",
+        "pgsql",
+        "Phar",
+        "posix",
+        "pspell",
+        "readline",
+        "Reflection",
+        "session",
+        "shmop",
+        "SimpleXML",
+        "snmp",
+        "soap",
+        "sockets",
+        "sodium",
+        "SPL",
+        "sqlite3",
+        "standard",
+        "superglobals",
+        "sysvmsg",
+        "sysvsem",
+        "sysvshm",
+        "tidy",
+        "tokenizer",
+        "xml",
+        "xmlreader",
+        "xmlrpc",
+        "xmlwriter",
         "wordpress",
-				"xsl",
-				"Zend OPcache",
-				"zip",
-				"zlib",
-				"gettext"
+        "xsl",
+        "Zend OPcache",
+        "zip",
+        "zlib",
+        "gettext"
       }
     }
   },
