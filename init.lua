@@ -186,12 +186,19 @@ require('lazy').setup({
   {
     'Exafunction/codeium.vim',
     event = 'BufEnter'
+  },
+  {
+    "iamcco/markdown-preview.nvim",
+    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+    ft = { "markdown" },
+    build = function() vim.fn["mkdp#util#install"]() end,
   }
 }, {})
 
 vim.o.hlsearch = false
 vim.opt.incsearch = true
 vim.opt.smartindent = true
+vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.colorcolumn = "90"
 vim.opt.wrap = false
@@ -308,7 +315,7 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     ensure_installed = { 'lua', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim',
-      'bash', 'php', 'html' },
+      'bash', 'php', 'html', 'markdown' },
 
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
     auto_install = false,
