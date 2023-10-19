@@ -56,9 +56,6 @@ require('lazy').setup({
       'rafamadriz/friendly-snippets',
     },
   },
-
-  -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim',  opts = {} },
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -121,16 +118,16 @@ require('lazy').setup({
     },
   },
   {
-    -- Add indentation guides even on blank lines
     'lukas-reineke/indent-blankline.nvim',
-    -- Enable `lukas-reineke/indent-blankline.nvim`
-    -- See `:help ibl`
     main = 'ibl',
     opts = {},
   },
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
+  {
+    'numToStr/Comment.nvim',
+    opts = {}
+  },
 
   -- Fuzzy Finder (files, lsp, etc)
   {
@@ -138,13 +135,8 @@ require('lazy').setup({
     branch = '0.1.x',
     dependencies = {
       'nvim-lua/plenary.nvim',
-      -- Fuzzy Finder Algorithm which requires local dependencies to be built.
-      -- Only load if `make` is available. Make sure you have the system
-      -- requirements installed.
       {
         'nvim-telescope/telescope-fzf-native.nvim',
-        -- NOTE: If you are having trouble with this installation,
-        --       refer to the README for telescope-fzf-native for more instructions.
         build = 'make',
         cond = function()
           return vim.fn.executable 'make' == 1
@@ -184,10 +176,17 @@ require('lazy').setup({
       })
     end
   },
+  -- DAP plugins
   { "mfussenegger/nvim-dap" },
   { "rcarriga/nvim-dap-ui" },
   { "theHamsta/nvim-dap-virtual-text" },
-  { "nvim-telescope/telescope-dap.nvim" }
+  { "nvim-telescope/telescope-dap.nvim" },
+  { "ThePrimeagen/harpoon" },
+  -- codeium, will need to authorize with ':Codeium Auth'
+  {
+    'Exafunction/codeium.vim',
+    event = 'BufEnter'
+  }
 }, {})
 
 vim.o.hlsearch = false
@@ -243,13 +242,26 @@ vim.keymap.set("n", "N", "Nzzzv")
 vim.keymap.set("x", "<leader>p", [["_dP]])
 vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])
 vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]])
+
+
+-- replace word globally
 vim.keymap.set("n", "<leader>sw", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
+
+-- add ; to the end of line
+vim.keymap.set('n', '<leader>;', '<esc>A;<esc>')
 
 -- trying to format doc on save
 vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
 
--- [[ Highlight on yank ]]
--- See `:help vim.highlight.on_yank()`
+-- harpoon keymaps
+local mark = require("harpoon.mark")
+local ui = require("harpoon.ui")
+vim.keymap.set("n", "<leader>m", mark.add_file)
+vim.keymap.set("n", "<C-e>", ui.toggle_quick_menu)
+vim.keymap.set("n", "<leader>1", function() ui.nav_file(1) end)
+vim.keymap.set("n", "<leader>2", function() ui.nav_file(2) end)
+vim.keymap.set("n", "<leader>3", function() ui.nav_file(3) end)
+vim.keymap.set("n", "<leader>4", function() ui.nav_file(4) end)
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
 vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function()
@@ -259,8 +271,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   pattern = '*',
 })
 
--- [[ Configure Telescope ]]
--- See `:help telescope` and `:help telescope.setup()`
 require('telescope').setup {
   defaults = {
     mappings = {
@@ -273,81 +283,14 @@ require('telescope').setup {
 }
 
 require("nvim-surround").setup()
-require("dapui").setup(
-  {
-    controls = {
-      element = "repl",
-      enabled = true,
-      icons = {
-        disconnect = "",
-        pause = "",
-        play = "",
-        run_last = "",
-        step_back = "",
-        step_into = "",
-        step_out = "",
-        step_over = "",
-        terminate = ""
-      }
-    },
-    element_mappings = {},
-    expand_lines = true,
-    floating = {
-      border = "single",
-      mappings = {
-        close = { "q", "<Esc>" }
-      }
-    },
-    force_buffers = true,
-    icons = {
-      collapsed = "",
-      current_frame = "",
-      expanded = ""
-    },
-    layouts = { {
-      elements = { {
-        id = "scopes",
-        size = 0.25
-      }, {
-        id = "breakpoints",
-        size = 0.25
-      }, {
-        id = "stacks",
-        size = 0.25
-      } },
-      position = "left",
-      size = 40
-    }, {
-      elements = { {
-        id = "repl",
-        size = 0.5
-      } },
-      position = "bottom",
-      size = 10
-    } },
-    mappings = {
-      edit = "e",
-      expand = { "<CR>", "<2-LeftMouse>" },
-      open = "o",
-      remove = "d",
-      repl = "r",
-      toggle = "t"
-    },
-    render = {
-      indent = 1,
-      max_value_lines = 100
-    }
-  }
-)
+require("dapui").setup()
 
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
 
--- See `:help telescope.builtin`
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
 vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers, { desc = '[ ] Find existing buffers' })
 vim.keymap.set('n', '<leader>/', function()
-  -- You can pass additional configuration to telescope to change theme, layout, etc.
   require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
     winblend = 10,
     previewer = false,
@@ -364,9 +307,8 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
-    -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim',
-      'bash' },
+    ensure_installed = { 'lua', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim',
+      'bash', 'php', 'html' },
 
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
     auto_install = false,
@@ -432,13 +374,11 @@ end, 0)
 -- DAP config
 local dap = require('dap')
 require('telescope').load_extension('dap')
-
 dap.adapters.php = {
   type = "executable",
   command = "node",
   args = { os.getenv("HOME") .. "/vscode-php-debug/out/phpDebug.js" }
 }
-
 dap.configurations.php = {
   {
     type = "php",
@@ -447,14 +387,16 @@ dap.configurations.php = {
     port = 9003,
     pathMappings = {
       ["/var/www/html"] = "${workspaceFolder}/www"
-    }
+    },
+    hostname = "localhost",
   }
 }
 
-vim.keymap.set('n', '<F5>', function() require('dap').continue() end)
-vim.keymap.set('n', '<F10>', function() require('dap').step_over() end)
-vim.keymap.set('n', '<F11>', function() require('dap').step_into() end)
-vim.keymap.set('n', '<F12>', function() require('dap').step_out() end)
+-- DAP keybindings
+vim.keymap.set('n', '<leader>xs', function() require('dap').continue() end)
+vim.keymap.set('n', '<C-0>', function() require('dap').step_over() end)
+vim.keymap.set('n', '<C-i>', function() require('dap').step_into() end)
+vim.keymap.set('n', '<C-o>', function() require('dap').step_out() end)
 vim.keymap.set('n', '<Leader>b', function() require('dap').toggle_breakpoint() end)
 vim.keymap.set('n', '<Leader>B', function() require('dap').set_breakpoint() end)
 vim.keymap.set('n', '<Leader>lp',
@@ -475,8 +417,6 @@ vim.keymap.set('n', '<Leader>ds', function()
   local widgets = require('dap.ui.widgets')
   widgets.centered_float(widgets.scopes)
 end)
-vim.keymap.set('n', '<leader>do', function() require('dapui').open() end)
-vim.keymap.set('n', '<leader>dc', function() require('dapui').close() end)
 vim.keymap.set('n', '<leader>dt', function() require('dapui').toggle() end)
 
 -- Diagnostic keymaptoggle
@@ -485,8 +425,6 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnos
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
--- [[ Configure LSP ]]
---  This function gets run when an LSP connects to a particular buffer.
 local on_attach = function(_, bufnr)
   local nmap = function(keys, func, desc)
     if desc then
@@ -524,37 +462,13 @@ local on_attach = function(_, bufnr)
   end, { desc = 'Format current buffer with LSP' })
 end
 
--- document existing key chains
-require('which-key').register {
-  ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-  ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-  ['<leader>g'] = { name = '[G]it', _ = 'which_key_ignore' },
-  ['<leader>h'] = { name = 'More git', _ = 'which_key_ignore' },
-  ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-  ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-  ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-}
-
--- mason-lspconfig requires that these setup functions are called in this order
--- before setting up the servers.
 require('mason').setup()
 require('mason-lspconfig').setup()
-
--- Enable the following language servers
---  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
---
---  Add any additional override configuration in the following tables. They will be passed to
---  the `settings` field of the server config. You must look up that documentation yourself.
---
---  If you want to override the default filetypes that your language server will attach to you can
---  define the property 'filetypes' to the map in question.
 local servers = {
-  -- clangd = {},
   -- gopls = {},
-  -- pyright = {},
   -- rust_analyzer = {},
   -- tsserver = {},
-  -- html = { filetypes = { 'html', 'twig', 'hbs'} },
+  html = { filetypes = { 'html', 'twig', 'hbs' } },
   intelephense = {
     intelephense = {
       stubs = {
@@ -666,14 +580,10 @@ mason_lspconfig.setup_handlers {
     }
   end,
 }
-
--- [[ Configure nvim-cmp ]]
--- See `:help cmp`
 local cmp = require 'cmp'
 local luasnip = require 'luasnip'
 require('luasnip.loaders.from_vscode').lazy_load()
 luasnip.config.setup {}
-
 cmp.setup {
   snippet = {
     expand = function(args)
@@ -690,7 +600,7 @@ cmp.setup {
       behavior = cmp.ConfirmBehavior.Replace,
       select = true,
     },
-    ['<Tab>'] = cmp.mapping(function(fallback)
+    ['<S-Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
       elseif luasnip.expand_or_locally_jumpable() then
@@ -699,15 +609,15 @@ cmp.setup {
         fallback()
       end
     end, { 'i', 's' }),
-    ['<S-Tab>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_prev_item()
-      elseif luasnip.locally_jumpable(-1) then
-        luasnip.jump(-1)
-      else
-        fallback()
-      end
-    end, { 'i', 's' }),
+    -- ['<S-Tab>'] = cmp.mapping(function(fallback)
+    --   if cmp.visible() then
+    --     cmp.select_prev_item()
+    --   elseif luasnip.locally_jumpable(-1) then
+    --     luasnip.jump(-1)
+    --   else
+    --     fallback()
+    --   end
+    -- end, { 'i', 's' }),
   },
   sources = {
     { name = 'nvim_lsp' },
