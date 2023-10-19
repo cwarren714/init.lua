@@ -94,7 +94,6 @@ require('lazy').setup({
       end,
     },
   },
-
   {
     -- Theme inspired by Atom
     'navarasu/onedark.nvim',
@@ -107,7 +106,6 @@ require('lazy').setup({
   {
     -- Set lualine as statusline
     'nvim-lualine/lualine.nvim',
-    -- See `:help lualine.txt`
     opts = {
       options = {
         icons_enabled = false,
@@ -115,6 +113,15 @@ require('lazy').setup({
         component_separators = '|',
         section_separators = '',
       },
+      sections = {
+        lualine_a = { 'mode' },
+        lualine_b = { 'branch', 'diff', 'diagnostics' },
+        lualine_c = { { 'filename', path = 1 } },
+        lualine_x = { 'encoding', 'fileformat', 'filetype' },
+        lualine_y = { 'progress' },
+        lualine_z = { 'location' }
+      },
+
     },
   },
   {
@@ -195,6 +202,7 @@ require('lazy').setup({
   }
 }, {})
 
+-- [[ OPTIONS ]]
 vim.o.hlsearch = false
 vim.opt.incsearch = true
 vim.opt.smartindent = true
@@ -230,32 +238,43 @@ vim.o.completeopt = 'menuone,noselect'
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
--- [[ Basic Keymaps ]]
 
--- Keymaps for better default experience
--- See `:help vim.keymap.set()`
+-- [[ KEYMAPS ]]
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 vim.keymap.set("n", '<leader>pv', vim.cmd.Ex)
 
 -- Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+
+-- moving selection up and down
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+
+-- moving up and down while centered
 vim.keymap.set("n", "<C-d>", "<C-d>zz")
 vim.keymap.set("n", "<C-u>", "<C-u>zz")
-vim.keymap.set("n", "n", "nzzzv")
-vim.keymap.set("n", "N", "Nzzzv")
+
+-- delete and paste but don't yank deletion into buffer
 vim.keymap.set("x", "<leader>p", [["_dP]])
+
+-- copy to clipboard
 vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])
+
+-- delete without yanking into buffer
 vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]])
 
+-- change without yanking into buffer
+vim.keymap.set({ "n", "v" }, "<leader>c", [["_c]])
 
 -- replace word globally
 vim.keymap.set("n", "<leader>sw", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 
 -- add ; to the end of line
 vim.keymap.set('n', '<leader>;', '<esc>A;<esc>')
+
+-- ctrl + s to save like a savage
+vim.keymap.set('n', '<C-s>', '<esc>:w<CR>')
 
 -- trying to format doc on save
 vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
@@ -392,8 +411,12 @@ dap.configurations.php = {
     request = "launch",
     name = "Listen for Xdebug",
     port = 9003,
+    -- BELOW IS DEFAULT BUT CHANGE IT TO WHATEVER IS NEEDED
+    -- pathMappings = {
+    --   ["/var/www/html"] = "${workspaceFolder}/www"
+    -- },
     pathMappings = {
-      ["/var/www/html"] = "${workspaceFolder}/www"
+      ["/var/www/html"] = "${workspaceFolder}"
     },
     hostname = "localhost",
   }
