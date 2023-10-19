@@ -183,7 +183,11 @@ require('lazy').setup({
         -- Configuration here, or leave empty to use defaults
       })
     end
-  }
+  },
+  { "mfussenegger/nvim-dap" },
+  { "rcarriga/nvim-dap-ui" },
+  { "theHamsta/nvim-dap-virtual-text" },
+  { "nvim-telescope/telescope-dap.nvim" }
 }, {})
 
 vim.o.hlsearch = false
@@ -269,6 +273,72 @@ require('telescope').setup {
 }
 
 require("nvim-surround").setup()
+require("dapui").setup(
+  {
+    controls = {
+      element = "repl",
+      enabled = true,
+      icons = {
+        disconnect = "",
+        pause = "",
+        play = "",
+        run_last = "",
+        step_back = "",
+        step_into = "",
+        step_out = "",
+        step_over = "",
+        terminate = ""
+      }
+    },
+    element_mappings = {},
+    expand_lines = true,
+    floating = {
+      border = "single",
+      mappings = {
+        close = { "q", "<Esc>" }
+      }
+    },
+    force_buffers = true,
+    icons = {
+      collapsed = "",
+      current_frame = "",
+      expanded = ""
+    },
+    layouts = { {
+      elements = { {
+        id = "scopes",
+        size = 0.25
+      }, {
+        id = "breakpoints",
+        size = 0.25
+      }, {
+        id = "stacks",
+        size = 0.25
+      } },
+      position = "left",
+      size = 40
+    }, {
+      elements = { {
+        id = "repl",
+        size = 0.5
+      } },
+      position = "bottom",
+      size = 10
+    } },
+    mappings = {
+      edit = "e",
+      expand = { "<CR>", "<2-LeftMouse>" },
+      open = "o",
+      remove = "d",
+      repl = "r",
+      toggle = "t"
+    },
+    render = {
+      indent = 1,
+      max_value_lines = 100
+    }
+  }
+)
 
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
@@ -359,7 +429,57 @@ vim.defer_fn(function()
   }
 end, 0)
 
--- Diagnostic keymaps
+-- DAP config
+local dap = require('dap')
+require('telescope').load_extension('dap')
+
+dap.adapters.php = {
+  type = "executable",
+  command = "node",
+  args = { os.getenv("HOME") .. "/vscode-php-debug/out/phpDebug.js" }
+}
+
+dap.configurations.php = {
+  {
+    type = "php",
+    request = "launch",
+    name = "Listen for Xdebug",
+    port = 9003,
+    pathMappings = {
+      ["/var/www/html"] = "${workspaceFolder}/www"
+    }
+  }
+}
+
+vim.keymap.set('n', '<F5>', function() require('dap').continue() end)
+vim.keymap.set('n', '<F10>', function() require('dap').step_over() end)
+vim.keymap.set('n', '<F11>', function() require('dap').step_into() end)
+vim.keymap.set('n', '<F12>', function() require('dap').step_out() end)
+vim.keymap.set('n', '<Leader>b', function() require('dap').toggle_breakpoint() end)
+vim.keymap.set('n', '<Leader>B', function() require('dap').set_breakpoint() end)
+vim.keymap.set('n', '<Leader>lp',
+  function() require('dap').set_breakpoint(nil, nil, vim.fn.input('Log point message: ')) end)
+vim.keymap.set('n', '<Leader>dr', function() require('dap').repl.open() end)
+vim.keymap.set('n', '<Leader>dl', function() require('dap').run_last() end)
+vim.keymap.set({ 'n', 'v' }, '<Leader>dh', function()
+  require('dap.ui.widgets').hover()
+end)
+vim.keymap.set({ 'n', 'v' }, '<Leader>dp', function()
+  require('dap.ui.widgets').preview()
+end)
+vim.keymap.set('n', '<Leader>df', function()
+  local widgets = require('dap.ui.widgets')
+  widgets.centered_float(widgets.frames)
+end)
+vim.keymap.set('n', '<Leader>ds', function()
+  local widgets = require('dap.ui.widgets')
+  widgets.centered_float(widgets.scopes)
+end)
+vim.keymap.set('n', '<leader>do', function() require('dapui').open() end)
+vim.keymap.set('n', '<leader>dc', function() require('dapui').close() end)
+vim.keymap.set('n', '<leader>dt', function() require('dapui').toggle() end)
+
+-- Diagnostic keymaptoggle
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
