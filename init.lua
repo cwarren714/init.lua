@@ -173,13 +173,13 @@ require('lazy').setup({
     event = "InsertEnter",
     opts = {}
   },
+  -- Surround with quotes, brackets, etc
   {
     "kylechui/nvim-surround",
-    version = "*", -- Use for stability; omit to use `main` branch for the latest features
+    version = "*",
     event = "VeryLazy",
     config = function()
       require("nvim-surround").setup({
-        -- Configuration here, or leave empty to use defaults
       })
     end
   },
@@ -188,18 +188,24 @@ require('lazy').setup({
   { "rcarriga/nvim-dap-ui" },
   { "theHamsta/nvim-dap-virtual-text" },
   { "nvim-telescope/telescope-dap.nvim" },
+
+  -- Harpoon to quickly switch between docs
   { "ThePrimeagen/harpoon" },
+
   -- codeium, will need to authorize with ':Codeium Auth'
   {
     'Exafunction/codeium.vim',
     event = 'BufEnter'
   },
+  -- simple markdown preview that opens in a browser
   {
     "iamcco/markdown-preview.nvim",
     cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
     ft = { "markdown" },
     build = function() vim.fn["mkdp#util#install"]() end,
-  }
+  },
+  -- testing plugin
+  { "vim-test/vim-test" },
 }, {})
 
 -- [[ OPTIONS ]]
@@ -296,6 +302,11 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   group = highlight_group,
   pattern = '*',
 })
+
+-- Testing keymaps
+
+vim.keymap.set("n", "<leader>tf", "<cmd>TestFile<CR>")
+vim.keymap.set("n", "<leader>ts", "<cmd>TestSuite<CR>")
 
 require('telescope').setup {
   defaults = {
@@ -448,6 +459,7 @@ vim.keymap.set('n', '<Leader>ds', function()
   widgets.centered_float(widgets.scopes)
 end)
 vim.keymap.set('n', '<leader>dt', function() require('dapui').toggle() end)
+vim.keymap.set('n', '<leader>dd', function() require('dap').status() end)
 
 -- Diagnostic keymaptoggle
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
@@ -495,7 +507,7 @@ end
 require('mason').setup()
 require('mason-lspconfig').setup()
 local servers = {
-  -- gopls = {},
+  gopls = {},
   -- rust_analyzer = {},
   -- tsserver = {},
   html = { filetypes = { 'html', 'twig', 'hbs' } },
