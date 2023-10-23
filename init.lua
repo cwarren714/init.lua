@@ -131,6 +131,7 @@ require('lazy').setup({
   },
 
   -- "gc" to comment visual regions/lines
+  -- "gcc" to commment a line in normal mode
   {
     'numToStr/Comment.nvim',
     opts = {}
@@ -179,8 +180,7 @@ require('lazy').setup({
     version = "*",
     event = "VeryLazy",
     config = function()
-      require("nvim-surround").setup({
-      })
+      require("nvim-surround").setup()
     end
   },
   -- DAP plugins
@@ -320,7 +320,29 @@ require('telescope').setup {
 }
 
 require("nvim-surround").setup()
-require("dapui").setup()
+-- dapui config
+require("dapui").setup({
+  layouts = {
+    {
+      elements = {
+        {
+          id = "repl",
+          size = 0.10,
+        },
+        {
+          id = "breakpoints",
+          size = 0.20,
+        },
+        {
+          id = "scopes",
+          size = 0.70,
+        }
+      },
+      size = 40,
+      position = "left",
+    }
+  }
+})
 
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
@@ -427,7 +449,7 @@ dap.configurations.php = {
     --   ["/var/www/html"] = "${workspaceFolder}/www"
     -- },
     pathMappings = {
-      ["/var/www/html"] = "${workspaceFolder}"
+      ["/var/www/html"] = "${workspaceFolder}/www"
     },
     hostname = "localhost",
   }
@@ -446,13 +468,6 @@ vim.keymap.set('n', '<Leader>dr', function() require('dap').repl.open() end)
 vim.keymap.set('n', '<Leader>dl', function() require('dap').run_last() end)
 vim.keymap.set({ 'n', 'v' }, '<Leader>dh', function()
   require('dap.ui.widgets').hover()
-end)
-vim.keymap.set({ 'n', 'v' }, '<Leader>dp', function()
-  require('dap.ui.widgets').preview()
-end)
-vim.keymap.set('n', '<Leader>df', function()
-  local widgets = require('dap.ui.widgets')
-  widgets.centered_float(widgets.frames)
 end)
 vim.keymap.set('n', '<Leader>ds', function()
   local widgets = require('dap.ui.widgets')
