@@ -187,6 +187,8 @@ require('lazy').setup({
   { "vim-test/vim-test" },
   -- multi line cursor - start with <C-n> to select word
   { "mg979/vim-visual-multi" },
+  -- csv rainbow colors
+  { "mechatroner/rainbow_csv" }
 }, {})
 
 -- [[ OPTIONS ]]
@@ -208,6 +210,7 @@ vim.o.updatetime = 250
 vim.o.timeoutlen = 300
 vim.o.completeopt = 'menuone,noselect'
 vim.o.termguicolors = true
+vim.o.cursorline = true
 
 
 -- [[ KEYMAPS ]]
@@ -409,7 +412,7 @@ dap.configurations.php = {
     port = 9003,
     -- BELOW IS DEFAULT BUT CHANGE IT TO WHATEVER IS NEEDED
     pathMappings = {
-      ["/var/www/html"] = "${workspaceFolder}/www"
+      ["/var/www/html"] = "${workspaceFolder}"
     },
     hostname = "localhost",
   }
