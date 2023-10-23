@@ -7,36 +7,21 @@ if not vim.loop.fs_stat(lazypath) then
     'clone',
     '--filter=blob:none',
     'https://github.com/folke/lazy.nvim.git',
-    '--branch=stable', -- latest stable release
+    '--branch=stable',
     lazypath,
   }
 end
 vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
-  -- NOTE: First, some plugins that don't require any configuration
-
-  -- Git related plugins
   'tpope/vim-fugitive',
   'tpope/vim-rhubarb',
-
-  -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
-
-  -- NOTE: This is where your plugins related to LSP can be installed.
-  --  The configuration is done below. Search for lspconfig to find it below.
   {
-    -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
     dependencies = {
-      -- Automatically install LSPs to stdpath for neovim
       'williamboman/mason.nvim',
       'williamboman/mason-lspconfig.nvim',
-
-      -- Useful status updates for LSP
-      -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
       { 'j-hui/fidget.nvim', tag = 'legacy', opts = {} },
-
-      -- Additional lua configuration, makes nvim stuff amazing!
       'folke/neodev.nvim',
     },
   },
@@ -45,14 +30,9 @@ require('lazy').setup({
     -- Autocompletion
     'hrsh7th/nvim-cmp',
     dependencies = {
-      -- Snippet Engine & its associated nvim-cmp source
       'L3MON4D3/LuaSnip',
       'saadparwaiz1/cmp_luasnip',
-
-      -- Adds LSP completion capabilities
       'hrsh7th/cmp-nvim-lsp',
-
-      -- Adds a number of user-friendly snippets
       'rafamadriz/friendly-snippets',
     },
   },
@@ -60,7 +40,6 @@ require('lazy').setup({
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     opts = {
-      -- See `:help gitsigns.txt`
       signs = {
         add = { text = '+' },
         change = { text = '~' },
@@ -204,8 +183,10 @@ require('lazy').setup({
     ft = { "markdown" },
     build = function() vim.fn["mkdp#util#install"]() end,
   },
-  -- testing plugin
+  -- testing plugin - <leader>tf to run file test
   { "vim-test/vim-test" },
+  -- multi line cursor - start with <C-n> to select word
+  { "mg979/vim-visual-multi" },
 }, {})
 
 -- [[ OPTIONS ]]
@@ -216,37 +197,22 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.colorcolumn = "90"
 vim.opt.wrap = false
--- Enable mouse mode
 vim.o.mouse = 'a'
-
 vim.o.clipboard = 'unnamedplus'
-
--- Enable break indent
 vim.o.breakindent = true
-
--- Save undo history
 vim.o.undofile = true
-
--- Case-insensitive searching UNLESS \C or capital in search
 vim.o.ignorecase = true
 vim.o.smartcase = true
-
--- Keep signcolumn on by default
 vim.wo.signcolumn = 'yes'
-
--- Decrease update time
 vim.o.updatetime = 250
 vim.o.timeoutlen = 300
-
--- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
-
--- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
 
 -- [[ KEYMAPS ]]
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
+-- [P]roject [V]iew to return to netrw
 vim.keymap.set("n", '<leader>pv', vim.cmd.Ex)
 
 -- Remap for dealing with word wrap
@@ -264,7 +230,7 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz")
 -- delete and paste but don't yank deletion into buffer
 vim.keymap.set("x", "<leader>p", [["_dP]])
 
--- copy to clipboard
+-- copy to system clipboard
 vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])
 
 -- delete without yanking into buffer
@@ -304,7 +270,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 })
 
 -- Testing keymaps
-
 vim.keymap.set("n", "<leader>tf", "<cmd>TestFile<CR>")
 vim.keymap.set("n", "<leader>ts", "<cmd>TestSuite<CR>")
 
@@ -320,7 +285,7 @@ require('telescope').setup {
 }
 
 require("nvim-surround").setup()
--- dapui config
+-- dapui config -- changes some elements of the UI
 require("dapui").setup({
   layouts = {
     {
@@ -346,7 +311,6 @@ require("dapui").setup({
 
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
-
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
 vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers, { desc = '[ ] Find existing buffers' })
 vim.keymap.set('n', '<leader>/', function()
@@ -355,11 +319,10 @@ vim.keymap.set('n', '<leader>/', function()
     previewer = false,
   })
 end, { desc = '[/] Fuzzily search in current buffer' })
-
 vim.keymap.set('n', '<leader>gf', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
 vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
 vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags, { desc = '[S]earch [H]elp' })
-vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
+-- vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
 vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
 vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
 vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [R]esume' })
@@ -367,7 +330,7 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     ensure_installed = { 'lua', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim',
-      'bash', 'php', 'html', 'markdown' },
+      'bash', 'php', 'html', 'markdown', 'json' },
 
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
     auto_install = false,
@@ -430,7 +393,7 @@ vim.defer_fn(function()
   }
 end, 0)
 
--- DAP config
+-- DAP config -- currently only for PHP/xdebug
 local dap = require('dap')
 require('telescope').load_extension('dap')
 dap.adapters.php = {
@@ -445,9 +408,6 @@ dap.configurations.php = {
     name = "Listen for Xdebug",
     port = 9003,
     -- BELOW IS DEFAULT BUT CHANGE IT TO WHATEVER IS NEEDED
-    -- pathMappings = {
-    --   ["/var/www/html"] = "${workspaceFolder}/www"
-    -- },
     pathMappings = {
       ["/var/www/html"] = "${workspaceFolder}/www"
     },
@@ -456,27 +416,21 @@ dap.configurations.php = {
 }
 
 -- DAP keybindings
+-- [X]debug [S]tart to start debugging
 vim.keymap.set('n', '<leader>xs', function() require('dap').continue() end)
 vim.keymap.set('n', '<C-0>', function() require('dap').step_over() end)
 vim.keymap.set('n', '<C-i>', function() require('dap').step_into() end)
 vim.keymap.set('n', '<C-o>', function() require('dap').step_out() end)
 vim.keymap.set('n', '<Leader>b', function() require('dap').toggle_breakpoint() end)
-vim.keymap.set('n', '<Leader>B', function() require('dap').set_breakpoint() end)
-vim.keymap.set('n', '<Leader>lp',
-  function() require('dap').set_breakpoint(nil, nil, vim.fn.input('Log point message: ')) end)
 vim.keymap.set('n', '<Leader>dr', function() require('dap').repl.open() end)
 vim.keymap.set('n', '<Leader>dl', function() require('dap').run_last() end)
-vim.keymap.set({ 'n', 'v' }, '<Leader>dh', function()
-  require('dap.ui.widgets').hover()
-end)
-vim.keymap.set('n', '<Leader>ds', function()
-  local widgets = require('dap.ui.widgets')
-  widgets.centered_float(widgets.scopes)
-end)
+-- leader [D]ebug [T]oggle to open/close ui
 vim.keymap.set('n', '<leader>dt', function() require('dapui').toggle() end)
+
+-- want to get this on status bar...
 vim.keymap.set('n', '<leader>dd', function() require('dap').status() end)
 
--- Diagnostic keymaptoggle
+-- Diagnostic keymap
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
@@ -491,17 +445,15 @@ local on_attach = function(_, bufnr)
     vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
   end
 
+  -- LSP Keymappings
   nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
   nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
-
   nmap('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
   nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
   nmap('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
   nmap('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
   nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
   nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
-
-  -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
   nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
 
@@ -512,8 +464,6 @@ local on_attach = function(_, bufnr)
   nmap('<leader>wl', function()
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   end, '[W]orkspace [L]ist Folders')
-
-  -- Create a command `:Format` local to the LSP buffer
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
     vim.lsp.buf.format()
   end, { desc = 'Format current buffer with LSP' })
@@ -522,12 +472,14 @@ end
 require('mason').setup()
 require('mason-lspconfig').setup()
 local servers = {
+  -- gopls will fail install when go isn't installed, it's fine
   gopls = {},
   -- rust_analyzer = {},
   -- tsserver = {},
   html = { filetypes = { 'html', 'twig', 'hbs' } },
   intelephense = {
     intelephense = {
+      -- stubs including wordpress
       stubs = {
         "apache",
         "bcmath",
@@ -613,20 +565,13 @@ local servers = {
   },
 }
 
--- Setup neovim lua configuration
 require('neodev').setup()
-
--- nvim-cmp supports additional completion capabilities, so broadcast that to servers
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
-
--- Ensure the servers above are installed
 local mason_lspconfig = require 'mason-lspconfig'
-
 mason_lspconfig.setup {
   ensure_installed = vim.tbl_keys(servers),
 }
-
 mason_lspconfig.setup_handlers {
   function(server_name)
     require('lspconfig')[server_name].setup {
@@ -666,15 +611,6 @@ cmp.setup {
         fallback()
       end
     end, { 'i', 's' }),
-    -- ['<S-Tab>'] = cmp.mapping(function(fallback)
-    --   if cmp.visible() then
-    --     cmp.select_prev_item()
-    --   elseif luasnip.locally_jumpable(-1) then
-    --     luasnip.jump(-1)
-    --   else
-    --     fallback()
-    --   end
-    -- end, { 'i', 's' }),
   },
   sources = {
     { name = 'nvim_lsp' },
