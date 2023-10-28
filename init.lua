@@ -412,9 +412,9 @@ dap.configurations.php = {
     port = 9003,
     -- BELOW IS DEFAULT BUT CHANGE IT TO WHATEVER IS NEEDED
     pathMappings = {
-      ["/var/www/html"] = "${workspaceFolder}"
+      ["/var/www/html"] = "${workspaceFolder}/www"
     },
-    hostname = "localhost",
+    -- hostname = "localhost",
   }
 }
 
@@ -481,6 +481,39 @@ local servers = {
   -- tsserver = {},
   html = { filetypes = { 'html', 'twig', 'hbs' } },
   intelephense = {
+  },
+  lua_ls = {
+    Lua = {
+      workspace = { checkThirdParty = false },
+      telemetry = { enable = false },
+    },
+  },
+}
+
+require('neodev').setup()
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+local mason_lspconfig = require 'mason-lspconfig'
+mason_lspconfig.setup {
+  ensure_installed = vim.tbl_keys(servers),
+}
+mason_lspconfig.setup_handlers {
+  function(server_name)
+    require('lspconfig')[server_name].setup {
+      capabilities = capabilities,
+      on_attach = on_attach,
+      settings = servers[server_name],
+      filetypes = (servers[server_name] or {}).filetypes,
+    }
+  end,
+}
+require('lspconfig').intelephense.setup {
+  capabilities = capabilities,
+  on_attach = on_attach,
+  root_dir = function(fname)
+    return vim.loop.cwd()
+  end,
+  settings = {
     intelephense = {
       -- stubs including wordpress
       stubs = {
@@ -560,31 +593,9 @@ local servers = {
       }
     }
   },
-  lua_ls = {
-    Lua = {
-      workspace = { checkThirdParty = false },
-      telemetry = { enable = false },
-    },
-  },
+  filetypes = { 'php' }
 }
 
-require('neodev').setup()
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
-local mason_lspconfig = require 'mason-lspconfig'
-mason_lspconfig.setup {
-  ensure_installed = vim.tbl_keys(servers),
-}
-mason_lspconfig.setup_handlers {
-  function(server_name)
-    require('lspconfig')[server_name].setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      settings = servers[server_name],
-      filetypes = (servers[server_name] or {}).filetypes,
-    }
-  end,
-}
 local cmp = require 'cmp'
 local luasnip = require 'luasnip'
 require('luasnip.loaders.from_vscode').lazy_load()
