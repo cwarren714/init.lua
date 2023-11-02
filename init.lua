@@ -188,7 +188,8 @@ require('lazy').setup({
   -- multi line cursor - start with <C-n> to select word
   { "mg979/vim-visual-multi" },
   -- csv rainbow colors
-  { "mechatroner/rainbow_csv" }
+  { "mechatroner/rainbow_csv" },
+  { "chentoast/marks.nvim" }
 }, {})
 
 -- [[ OPTIONS ]]
@@ -288,6 +289,7 @@ require('telescope').setup {
 }
 
 require("nvim-surround").setup()
+require("marks").setup()
 -- dapui config -- changes some elements of the UI
 require("dapui").setup({
   layouts = {
