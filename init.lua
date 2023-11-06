@@ -289,7 +289,13 @@ require('telescope').setup {
 }
 
 require("nvim-surround").setup()
-require("marks").setup()
+require("marks").setup(
+    {
+    mappings = {
+      preview = "pm",
+    }
+  }
+)
 -- dapui config -- changes some elements of the UI
 require("dapui").setup({
   layouts = {
