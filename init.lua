@@ -293,6 +293,7 @@ require("marks").setup(
     {
     mappings = {
       preview = "pm",
+      annotate = "am"
     }
   }
 )
