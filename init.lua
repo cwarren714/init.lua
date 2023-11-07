@@ -277,6 +277,9 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 vim.keymap.set("n", "<leader>tf", "<cmd>TestFile<CR>")
 vim.keymap.set("n", "<leader>ts", "<cmd>TestSuite<CR>")
 
+-- delete all global marks and clear shada
+vim.keymap.set("n", "<leader>dg", "<cmd>:delm! | delm A-Z0-9 | wshada!<CR>")
+
 require('telescope').setup {
   defaults = {
     mappings = {
@@ -290,7 +293,7 @@ require('telescope').setup {
 
 require("nvim-surround").setup()
 require("marks").setup(
-    {
+  {
     mappings = {
       preview = "pm",
       annotate = "am"
