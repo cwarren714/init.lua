@@ -424,9 +424,9 @@ dap.configurations.php = {
     port = 9003,
     -- BELOW IS DEFAULT BUT CHANGE IT TO WHATEVER IS NEEDED
     pathMappings = {
-      ["/var/www/html"] = "${workspaceFolder}/www"
+      ["/var/www/html"] = "${workspaceFolder}"
     },
-    -- hostname = "localhost",
+    hostname = "localhost",
   }
 }
 
@@ -488,9 +488,9 @@ require('mason').setup()
 require('mason-lspconfig').setup()
 local servers = {
   -- gopls will fail install when go isn't installed, it's fine
-  gopls = {},
+  -- gopls = {},
   -- rust_analyzer = {},
-  -- tsserver = {},
+  tsserver = {},
   html = { filetypes = { 'html', 'twig', 'hbs' } },
   intelephense = {
   },
