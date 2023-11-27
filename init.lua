@@ -212,6 +212,9 @@ vim.o.timeoutlen = 300
 vim.o.completeopt = 'menuone,noselect'
 vim.o.termguicolors = true
 vim.o.cursorline = true
+vim.o.foldmethod = "indent"
+vim.o.foldenable = true
+vim.o.foldlevel = 99
 
 
 -- [[ KEYMAPS ]]
