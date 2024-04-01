@@ -8,7 +8,6 @@ if not vim.loop.fs_stat(lazypath) then
     '--filter=blob:none',
     'https://github.com/folke/lazy.nvim.git',
     '--branch=stable',
-    lazypath,
   }
 end
 vim.opt.rtp:prepend(lazypath)
@@ -164,7 +163,7 @@ require('lazy').setup({
   },
   -- DAP plugins
   { "mfussenegger/nvim-dap" },
-  { "rcarriga/nvim-dap-ui" },
+  { "rcarriga/nvim-dap-ui",             dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" } },
   { "theHamsta/nvim-dap-virtual-text" },
   { "nvim-telescope/telescope-dap.nvim" },
 
@@ -189,11 +188,34 @@ require('lazy').setup({
   { "mg979/vim-visual-multi" },
   -- csv rainbow colors
   { "mechatroner/rainbow_csv" },
-  { "chentoast/marks.nvim" }
+  { "chentoast/marks.nvim" },
+  {
+    "christoomey/vim-tmux-navigator",
+    cmd = {
+      "TmuxNavigateLeft",
+      "TmuxNavigateDown",
+      "TmuxNavigateUp",
+      "TmuxNavigateRight",
+      "TmuxNavigatePrevious",
+    },
+    keys = {
+      { "<c-h>",  "<cmd><C-U>TmuxNavigateLeft<cr>" },
+      { "<c-j>",  "<cmd><C-U>TmuxNavigateDown<cr>" },
+      { "<c-k>",  "<cmd><C-U>TmuxNavigateUp<cr>" },
+      { "<c-l>",  "<cmd><C-U>TmuxNavigateRight<cr>" },
+      { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
+    },
+  },
+  {
+    "danymat/neogen",
+    config = true,
+  }
 }, {})
 
 -- [[ OPTIONS ]]
 vim.o.hlsearch = false
+vim.opt.spell = true
+vim.opt.spelllang = "en_us"
 vim.opt.incsearch = true
 vim.opt.smartindent = true
 vim.opt.number = true
@@ -215,6 +237,7 @@ vim.o.cursorline = true
 vim.o.foldmethod = "indent"
 vim.o.foldenable = true
 vim.o.foldlevel = 99
+
 
 
 -- [[ KEYMAPS ]]
@@ -255,6 +278,9 @@ vim.keymap.set('n', '<leader>;', '<esc>A;<esc>')
 -- ctrl + s to save like a savage
 vim.keymap.set('n', '<C-s>', '<esc>:w<CR>')
 
+-- annotation like phpdoc
+vim.keymap.set('n', '<leader>pd', ':lua require("neogen").generate()<cr>')
+
 -- trying to format doc on save
 vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
 
@@ -280,9 +306,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 vim.keymap.set("n", "<leader>tf", "<cmd>TestFile<CR>")
 vim.keymap.set("n", "<leader>ts", "<cmd>TestSuite<CR>")
 
--- delete all global marks and clear shada
-vim.keymap.set("n", "<leader>dg", "<cmd>:delm! | delm A-Z0-9 | wshada!<CR>")
-
 require('telescope').setup {
   defaults = {
     mappings = {
@@ -297,6 +320,7 @@ require('telescope').setup {
 require("nvim-surround").setup()
 require("marks").setup(
   {
+    force_write_shada = true,
     mappings = {
       preview = "pm",
       annotate = "am"
@@ -427,9 +451,9 @@ dap.configurations.php = {
     port = 9003,
     -- BELOW IS DEFAULT BUT CHANGE IT TO WHATEVER IS NEEDED
     pathMappings = {
-      ["/var/www/html"] = "${workspaceFolder}"
+      ["/var/www/html"] = "${workspaceFolder}/www"
     },
-    hostname = "localhost",
+    -- hostname = "localhost",
   }
 }
 
@@ -491,9 +515,9 @@ require('mason').setup()
 require('mason-lspconfig').setup()
 local servers = {
   -- gopls will fail install when go isn't installed, it's fine
-  -- gopls = {},
+  gopls = {},
   -- rust_analyzer = {},
-  tsserver = {},
+  -- tsserver = {},
   html = { filetypes = { 'html', 'twig', 'hbs' } },
   intelephense = {
   },
@@ -501,6 +525,9 @@ local servers = {
     Lua = {
       workspace = { checkThirdParty = false },
       telemetry = { enable = false },
+      diagnostics = {
+        globals = { 'vim', 'use' },
+      }
     },
   },
 }
