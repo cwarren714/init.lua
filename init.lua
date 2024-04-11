@@ -8,7 +8,6 @@ if not vim.loop.fs_stat(lazypath) then
     '--filter=blob:none',
     'https://github.com/folke/lazy.nvim.git',
     '--branch=stable',
-    lazypath,
   }
 end
 vim.opt.rtp:prepend(lazypath)
@@ -196,6 +195,23 @@ require('lazy').setup({
   { "mechatroner/rainbow_csv" },
   { "chentoast/marks.nvim" },
   {
+    "christoomey/vim-tmux-navigator",
+    cmd = {
+      "TmuxNavigateLeft",
+      "TmuxNavigateDown",
+      "TmuxNavigateUp",
+      "TmuxNavigateRight",
+      "TmuxNavigatePrevious",
+    },
+    keys = {
+      { "<c-h>",  "<cmd><C-U>TmuxNavigateLeft<cr>" },
+      { "<c-j>",  "<cmd><C-U>TmuxNavigateDown<cr>" },
+      { "<c-k>",  "<cmd><C-U>TmuxNavigateUp<cr>" },
+      { "<c-l>",  "<cmd><C-U>TmuxNavigateRight<cr>" },
+      { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
+    },
+  },
+  {
     "danymat/neogen",
     config = true,
   }
@@ -203,6 +219,8 @@ require('lazy').setup({
 
 -- [[ OPTIONS ]]
 vim.o.hlsearch = false
+vim.opt.spell = true
+vim.opt.spelllang = "en_us"
 vim.opt.incsearch = true
 vim.opt.smartindent = true
 vim.opt.number = true
@@ -221,6 +239,10 @@ vim.o.timeoutlen = 300
 vim.o.completeopt = 'menuone,noselect'
 vim.o.termguicolors = true
 vim.o.cursorline = true
+vim.o.foldmethod = "indent"
+vim.o.foldenable = true
+vim.o.foldlevel = 99
+
 
 
 -- [[ KEYMAPS ]]
@@ -304,7 +326,15 @@ require('telescope').setup {
 }
 
 require("nvim-surround").setup()
-require("marks").setup()
+require("marks").setup(
+  {
+    force_write_shada = true,
+    mappings = {
+      preview = "pm",
+      annotate = "am"
+    }
+  }
+)
 -- dapui config -- changes some elements of the UI
 require("dapui").setup({
   layouts = {
@@ -503,6 +533,9 @@ local servers = {
     Lua = {
       workspace = { checkThirdParty = false },
       telemetry = { enable = false },
+      diagnostics = {
+        globals = { 'vim', 'use' },
+      }
     },
   },
 }
