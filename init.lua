@@ -25,12 +25,17 @@ require('lazy').setup({
       'folke/neodev.nvim',
     },
   },
-
+  {
+    "L3MON4D3/LuaSnip",
+    -- follow latest release.
+    version = "v2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+    -- install jsregexp (optional!).
+    build = "make install_jsregexp"
+  },
   {
     -- Autocompletion
     'hrsh7th/nvim-cmp',
     dependencies = {
-      'L3MON4D3/LuaSnip',
       'saadparwaiz1/cmp_luasnip',
       'hrsh7th/cmp-nvim-lsp',
       'rafamadriz/friendly-snippets',
@@ -164,7 +169,7 @@ require('lazy').setup({
   },
   -- DAP plugins
   { "mfussenegger/nvim-dap" },
-  { "rcarriga/nvim-dap-ui" },
+  { "rcarriga/nvim-dap-ui", dependencies = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"} },
   { "theHamsta/nvim-dap-virtual-text" },
   { "nvim-telescope/telescope-dap.nvim" },
 
@@ -189,7 +194,11 @@ require('lazy').setup({
   { "mg979/vim-visual-multi" },
   -- csv rainbow colors
   { "mechatroner/rainbow_csv" },
-  { "chentoast/marks.nvim" }
+  { "chentoast/marks.nvim" },
+  {
+    "danymat/neogen",
+    config = true,
+  }
 }, {})
 
 -- [[ OPTIONS ]]
@@ -251,6 +260,12 @@ vim.keymap.set('n', '<leader>;', '<esc>A;<esc>')
 
 -- ctrl + s to save like a savage
 vim.keymap.set('n', '<C-s>', '<esc>:w<CR>')
+
+-- annotation like phpdoc
+vim.keymap.set('n', '<leader>pd', ':lua require("neogen").generate()<cr>')
+
+-- return to last buffer with leader l
+vim.keymap.set({ "n", "v" }, "<leader>l", "<C-6>")
 
 -- trying to format doc on save
 vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
@@ -480,7 +495,7 @@ local servers = {
   -- gopls will fail install when go isn't installed, it's fine
   gopls = {},
   -- rust_analyzer = {},
-  -- tsserver = {},
+  tsserver = {},
   html = { filetypes = { 'html', 'twig', 'hbs' } },
   intelephense = {
   },
