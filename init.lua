@@ -296,6 +296,14 @@ vim.keymap.set({ "n", "v" }, "<leader>l", "<C-6>")
 -- trying to format doc on save
 vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
 
+-- toggle supermaven
+vim.keymap.set('n', '<leader>sm', function()
+  local api = require('supermaven-nvim.api')
+  api.toggle()
+  print('Supermaven running: ' .. tostring(api.is_running()))
+end)
+
+
 -- harpoon keymaps
 local mark = require("harpoon.mark")
 local ui = require("harpoon.ui")
