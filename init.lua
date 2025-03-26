@@ -82,15 +82,6 @@ require('lazy').setup({
     },
   },
   {
-    -- Theme inspired by Atom
-    'navarasu/onedark.nvim',
-    priority = 1000,
-    config = function()
-      vim.cmd.colorscheme 'onedark'
-    end,
-  },
-
-  {
     -- Set lualine as statusline
     'nvim-lualine/lualine.nvim',
     opts = {
@@ -170,11 +161,6 @@ require('lazy').setup({
       require("nvim-surround").setup()
     end
   },
-  -- DAP plugins
-  { "mfussenegger/nvim-dap" },
-  { "rcarriga/nvim-dap-ui",             dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" } },
-  { "theHamsta/nvim-dap-virtual-text" },
-  { "nvim-telescope/telescope-dap.nvim" },
 
   -- Harpoon to quickly switch between docs
   { "ThePrimeagen/harpoon" },
@@ -193,31 +179,19 @@ require('lazy').setup({
   },
   -- testing plugin - <leader>tf to run file test
   { "vim-test/vim-test" },
-  -- multi line cursor - start with <C-n> to select word
-  { "mg979/vim-visual-multi" },
-  -- csv rainbow colors
-  { "mechatroner/rainbow_csv" },
   { "chentoast/marks.nvim" },
-  {
-    "christoomey/vim-tmux-navigator",
-    cmd = {
-      "TmuxNavigateLeft",
-      "TmuxNavigateDown",
-      "TmuxNavigateUp",
-      "TmuxNavigateRight",
-      "TmuxNavigatePrevious",
-    },
-    keys = {
-      { "<c-h>",  "<cmd><C-U>TmuxNavigateLeft<cr>" },
-      { "<c-j>",  "<cmd><C-U>TmuxNavigateDown<cr>" },
-      { "<c-k>",  "<cmd><C-U>TmuxNavigateUp<cr>" },
-      { "<c-l>",  "<cmd><C-U>TmuxNavigateRight<cr>" },
-      { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
-    },
-  },
   {
     "danymat/neogen",
     config = true,
+  },
+  { 'prichrd/netrw.nvim' },
+  { 'nvim-tree/nvim-web-devicons' },
+  { "catppuccin/nvim",            name = "catppuccin", priority = 1000 },
+  { "rebelot/kanagawa.nvim" },
+  {
+    "folke/todo-comments.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {}
   }
 }, {})
 
@@ -243,11 +217,18 @@ vim.o.timeoutlen = 300
 vim.o.completeopt = 'menuone,noselect'
 vim.o.termguicolors = true
 vim.o.cursorline = true
-vim.o.foldmethod = "indent"
-vim.o.foldenable = true
+vim.o.foldmethod = "expr"
+vim.o.foldexpr = "nvim_treesitter#foldexpr()"
 vim.o.foldlevel = 99
+vim.o.foldtext = "v:lua.Fold_text()"
 
+vim.cmd.colorscheme 'catppuccin'
 
+function Fold_text()
+  local line = vim.fn.getline(vim.v.foldstart)
+  local line_count = vim.v.foldend - vim.v.foldstart + 1
+  return " ⚡ " .. line .. ": " .. line_count .. " lines"
+end
 
 -- [[ KEYMAPS ]]
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
@@ -293,8 +274,15 @@ vim.keymap.set('n', '<leader>pd', ':lua require("neogen").generate()<cr>')
 -- return to last buffer with leader l
 vim.keymap.set({ "n", "v" }, "<leader>l", "<C-6>")
 
+-- send TODOs to quickfix
+vim.keymap.set('n', '<leader>td', '<cmd>TodoTelescope<CR>')
+vim.keymap.set('n', '<leader>tdq', '<cmd>TodoQuickFix<CR>')
+
 -- trying to format doc on save
-vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
+-- vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
+
+-- format with leader space
+vim.keymap.set('n', '<leader><space>', '<cmd>lua vim.lsp.buf.format()<CR>')
 
 --quickfix command shortcuts
 vim.keymap.set('n', '<leader>qn', ':cnext<CR>')
@@ -329,6 +317,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 })
 
 -- Testing keymaps
+vim.keymap.set("n", "<leader>t", "<cmd>TestNearest<CR>")
 vim.keymap.set("n", "<leader>tf", "<cmd>TestFile<CR>")
 vim.keymap.set("n", "<leader>ts", "<cmd>TestSuite<CR>")
 
@@ -357,29 +346,8 @@ require("marks").setup(
     }
   }
 )
--- dapui config -- changes some elements of the UI
-require("dapui").setup({
-  layouts = {
-    {
-      elements = {
-        {
-          id = "repl",
-          size = 0.10,
-        },
-        {
-          id = "breakpoints",
-          size = 0.20,
-        },
-        {
-          id = "scopes",
-          size = 0.70,
-        }
-      },
-      size = 40,
-      position = "left",
-    }
-  }
-})
+require('netrw').setup()
+vim.cmd("colorscheme kanagawa-wave")
 
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
@@ -465,43 +433,6 @@ vim.defer_fn(function()
   }
 end, 0)
 
--- DAP config -- currently only for PHP/xdebug
-local dap = require('dap')
-require('telescope').load_extension('dap')
-dap.adapters.php = {
-  type = "executable",
-  command = "node",
-  args = { os.getenv("HOME") .. "/vscode-php-debug/out/phpDebug.js" }
-}
-dap.configurations.php = {
-  {
-    type = "php",
-    request = "launch",
-    name = "Listen for Xdebug",
-    port = 9003,
-    -- BELOW IS DEFAULT BUT CHANGE IT TO WHATEVER IS NEEDED
-    pathMappings = {
-      ["/var/www/html"] = "${workspaceFolder}/www"
-    },
-    -- hostname = "localhost",
-  }
-}
-
--- DAP keybindings
--- [X]debug [S]tart to start debugging
-vim.keymap.set('n', '<leader>xs', function() require('dap').continue() end)
-vim.keymap.set('n', '<C-0>', function() require('dap').step_over() end)
-vim.keymap.set('n', '<C-i>', function() require('dap').step_into() end)
-vim.keymap.set('n', '<C-o>', function() require('dap').step_out() end)
-vim.keymap.set('n', '<Leader>b', function() require('dap').toggle_breakpoint() end)
-vim.keymap.set('n', '<Leader>dr', function() require('dap').repl.open() end)
-vim.keymap.set('n', '<Leader>dl', function() require('dap').run_last() end)
--- leader [D]ebug [T]oggle to open/close ui
-vim.keymap.set('n', '<leader>dt', function() require('dapui').toggle() end)
-
--- want to get this on status bar...
-vim.keymap.set('n', '<leader>dd', function() require('dap').status() end)
-
 -- Diagnostic keymap
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
@@ -545,12 +476,9 @@ require('mason').setup()
 require('mason-lspconfig').setup()
 local servers = {
   -- gopls will fail install when go isn't installed, it's fine
-  gopls = {},
   -- rust_analyzer = {},
-  tsserver = {},
   html = { filetypes = { 'html', 'twig', 'hbs' } },
-  intelephense = {
-  },
+  intelephense = {},
   lua_ls = {
     Lua = {
       workspace = { checkThirdParty = false },
@@ -703,7 +631,6 @@ cmp.setup {
     { name = 'luasnip' },
   },
 }
-
 function Remove_qf_item()
   local curqfidx = vim.fn.line('.')
   local qfall = vim.fn.getqflist()
@@ -729,6 +656,3 @@ end
 -- quickfix list delete keymap bound to "dd" when hovering over item in quickfix list
 vim.cmd("command! RemoveQFItem lua Remove_qf_item()")
 vim.api.nvim_command("autocmd FileType qf nnoremap <buffer> dd :RemoveQFItem<cr>")
-
--- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=2 sts=2 sw=2 et
