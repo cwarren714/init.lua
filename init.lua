@@ -7,7 +7,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({
       { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { out, "WarningMsg" },
+      { out,                            "WarningMsg" },
       { "\nPress any key to exit..." },
     }, true, {})
     vim.fn.getchar()
@@ -107,7 +107,6 @@ require('lazy').setup({
     main = 'ibl',
     opts = {},
   },
-
   -- "gc" to comment visual regions/lines
   -- "gcc" to commment a line in normal mode
   {
@@ -161,23 +160,14 @@ require('lazy').setup({
       require("nvim-surround").setup()
     end
   },
-
   -- Harpoon to quickly switch between docs
   { "ThePrimeagen/harpoon" },
   {
-      "supermaven-inc/supermaven-nvim",
-      config = function()
-        require("supermaven-nvim").setup({})
-      end,
+    "supermaven-inc/supermaven-nvim",
+    config = function()
+      require("supermaven-nvim").setup({})
+    end,
   },
-  -- simple markdown preview that opens in a browser
-  {
-    "iamcco/markdown-preview.nvim",
-    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-    ft = { "markdown" },
-    build = function() vim.fn["mkdp#util#install"]() end,
-  },
-  -- testing plugin - <leader>tf to run file test
   { "vim-test/vim-test" },
   { "chentoast/marks.nvim" },
   {
@@ -185,14 +175,14 @@ require('lazy').setup({
     config = true,
   },
   { 'prichrd/netrw.nvim' },
-  { 'nvim-tree/nvim-web-devicons' },
-  { "catppuccin/nvim",            name = "catppuccin", priority = 1000 },
+  { 'nvim-tree/nvim-web-devicons', opts = {} },
   { "rebelot/kanagawa.nvim" },
   {
     "folke/todo-comments.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {}
-  }
+  },
+  { 'junegunn/vim-easy-align' },
 }, {})
 
 -- [[ OPTIONS ]]
@@ -221,8 +211,6 @@ vim.o.foldmethod = "expr"
 vim.o.foldexpr = "nvim_treesitter#foldexpr()"
 vim.o.foldlevel = 99
 vim.o.foldtext = "v:lua.Fold_text()"
-
-vim.cmd.colorscheme 'catppuccin'
 
 function Fold_text()
   local line = vim.fn.getline(vim.v.foldstart)
@@ -274,21 +262,24 @@ vim.keymap.set('n', '<leader>pd', ':lua require("neogen").generate()<cr>')
 -- return to last buffer with leader l
 vim.keymap.set({ "n", "v" }, "<leader>l", "<C-6>")
 
--- send TODOs to quickfix
+-- todos in telescope or quickfix
 vim.keymap.set('n', '<leader>td', '<cmd>TodoTelescope<CR>')
 vim.keymap.set('n', '<leader>tdq', '<cmd>TodoQuickFix<CR>')
 
 -- trying to format doc on save
--- vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
+vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
 
 -- format with leader space
-vim.keymap.set('n', '<leader><space>', '<cmd>lua vim.lsp.buf.format()<CR>')
+-- vim.keymap.set('n', '<leader><space>', '<cmd>lua vim.lsp.buf.format()<CR>')
 
 --quickfix command shortcuts
 vim.keymap.set('n', '<leader>qn', ':cnext<CR>')
 vim.keymap.set('n', '<leader>qp', ':cprevious<CR>')
 vim.keymap.set('n', '<leader>qf', ':cfirst<CR>')
 vim.keymap.set('n', '<leader>ql', ':clast<CR>')
+
+-- vim align keymaps
+vim.keymap.set('v', '<leader>a', '<Plug>(EasyAlign)')
 
 -- toggle supermaven
 vim.keymap.set('n', '<leader>sm', function()
@@ -369,12 +360,12 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
+    modules = {},
+    sync_install = false,
+    ignore_install = {},
     ensure_installed = { 'lua', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim',
       'bash', 'php', 'html', 'markdown', 'json' },
-
-    -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
     auto_install = false,
-
     highlight = { enable = true },
     indent = { enable = true },
     incremental_selection = {
@@ -389,9 +380,8 @@ vim.defer_fn(function()
     textobjects = {
       select = {
         enable = true,
-        lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+        lookahead = true,
         keymaps = {
-          -- You can use the capture groups defined in textobjects.scm
           ['aa'] = '@parameter.outer',
           ['ia'] = '@parameter.inner',
           ['af'] = '@function.outer',
@@ -402,7 +392,7 @@ vim.defer_fn(function()
       },
       move = {
         enable = true,
-        set_jumps = true, -- whether to set jumps in the jumplist
+        set_jumps = true,
         goto_next_start = {
           [']m'] = '@function.outer',
           [']]'] = '@class.outer',
@@ -451,6 +441,7 @@ local on_attach = function(_, bufnr)
   -- LSP Keymappings
   nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
   nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+  -- opens in a vertical split
   nmap('gd', "<cmd>lua require('telescope.builtin').lsp_definitions({ jump_type = 'vsplit' })<CR>", '[G]oto [D]efinition')
   nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
   nmap('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
@@ -496,6 +487,7 @@ capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 local mason_lspconfig = require 'mason-lspconfig'
 mason_lspconfig.setup {
   ensure_installed = vim.tbl_keys(servers),
+  automatic_installation = true,
 }
 mason_lspconfig.setup_handlers {
   function(server_name)
@@ -510,7 +502,7 @@ mason_lspconfig.setup_handlers {
 require('lspconfig').intelephense.setup {
   capabilities = capabilities,
   on_attach = on_attach,
-  root_dir = function(fname)
+  root_dir = function()
     return vim.loop.cwd()
   end,
   settings = {
@@ -656,3 +648,7 @@ end
 -- quickfix list delete keymap bound to "dd" when hovering over item in quickfix list
 vim.cmd("command! RemoveQFItem lua Remove_qf_item()")
 vim.api.nvim_command("autocmd FileType qf nnoremap <buffer> dd :RemoveQFItem<cr>")
+
+-- remove underline from spelling errors
+vim.api.nvim_set_hl(0, "SpellBad", { undercurl = false })
+vim.api.nvim_set_hl(0, "SpellCap", { undercurl = false })
