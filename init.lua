@@ -17,7 +17,6 @@ end
 vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   'tpope/vim-fugitive',
-  'tpope/vim-rhubarb',
   'tpope/vim-sleuth',
   {
     'neovim/nvim-lspconfig',
@@ -56,28 +55,16 @@ require('lazy').setup({
         changedelete = { text = '~' },
       },
       on_attach = function(bufnr)
-        vim.keymap.set('n', '<leader>hp', require('gitsigns').preview_hunk, { buffer = bufnr, desc = 'Preview git hunk' })
-
-        -- don't override the built-in and fugitive keymaps
-        local gs = package.loaded.gitsigns
-        vim.keymap.set({ 'n', 'v' }, ']c', function()
-          if vim.wo.diff then
-            return ']c'
-          end
-          vim.schedule(function()
-            gs.next_hunk()
-          end)
-          return '<Ignore>'
-        end, { expr = true, buffer = bufnr, desc = 'Jump to next hunk' })
-        vim.keymap.set({ 'n', 'v' }, '[c', function()
-          if vim.wo.diff then
-            return '[c'
-          end
-          vim.schedule(function()
-            gs.prev_hunk()
-          end)
-          return '<Ignore>'
-        end, { expr = true, buffer = bufnr, desc = 'Jump to previous hunk' })
+        -- preview hunk
+        vim.keymap.set('n', '<leader>ph', require('gitsigns').preview_hunk, { buffer = bufnr, desc = 'Preview git hunk' })
+        -- back hunk, auto previews
+        vim.keymap.set('n', '<leader>bh', function()
+          require("gitsigns").nav_hunk('prev', { buffer = bufnr, preview = true })
+        end)
+        -- next hunk, auto previews
+        vim.keymap.set('n', '<leader>nh', function()
+          require("gitsigns").nav_hunk('next', { buffer = bufnr, preview = true })
+        end)
       end,
     },
   },
@@ -102,11 +89,7 @@ require('lazy').setup({
 
     },
   },
-  {
-    'lukas-reineke/indent-blankline.nvim',
-    main = 'ibl',
-    opts = {},
-  },
+  { 'echasnovski/mini.indentscope', version = false },
   -- "gc" to comment visual regions/lines
   -- "gcc" to commment a line in normal mode
   {
@@ -183,6 +166,49 @@ require('lazy').setup({
     opts = {}
   },
   { 'junegunn/vim-easy-align' },
+  {
+    "hat0uma/csvview.nvim",
+    opts = {}
+  },
+  {
+    "jake-stewart/multicursor.nvim",
+    branch = "1.0",
+    config = function()
+      local mc = require("multicursor-nvim")
+      mc.setup()
+      local set = vim.keymap.set
+      -- Add or skip cursor above/below the main cursor.
+      set({ "n", "x" }, "<up>", function() mc.lineAddCursor(-1) end)
+      set({ "n", "x" }, "<down>", function() mc.lineAddCursor(1) end)
+      set({ "n", "x" }, "<leader><up>", function() mc.lineSkipCursor(-1) end)
+      set({ "n", "x" }, "<leader><down>", function() mc.lineSkipCursor(1) end)
+      set({ "n", "x" }, "<leader>A", function() mc.matchAllAddCursors() end)
+
+      -- Add or skip adding a new cursor by matching word/selection
+      set({ "n", "x" }, "<leader>n", function() mc.matchAddCursor(1) end)
+      set({ "n", "x" }, "<leader>N", function() mc.matchAddCursor(-1) end)
+
+      mc.addKeymapLayer(function(layerSet)
+        -- Enable and clear cursors using escape.
+        layerSet("n", "<esc>", function()
+          if not mc.cursorsEnabled() then
+            mc.enableCursors()
+          else
+            mc.clearCursors()
+          end
+        end)
+      end)
+
+      local hl = vim.api.nvim_set_hl
+      hl(0, "MultiCursorCursor", { link = "Cursor" })
+      hl(0, "MultiCursorVisual", { link = "Visual" })
+      hl(0, "MultiCursorSign", { link = "SignColumn" })
+      hl(0, "MultiCursorMatchPreview", { link = "Search" })
+      hl(0, "MultiCursorDisabledCursor", { link = "Visual" })
+      hl(0, "MultiCursorDisabledVisual", { link = "Visual" })
+      hl(0, "MultiCursorDisabledSign", { link = "SignColumn" })
+    end
+  }
 }, {})
 
 -- [[ OPTIONS ]]
@@ -314,6 +340,37 @@ vim.keymap.set("n", "<leader>ts", "<cmd>TestSuite<CR>")
 
 require('telescope').setup {
   defaults = {
+    preview = {
+      hooks = {
+        filetype_hook = function(filepath, bufnr, opts)
+          -- you could analogously check opts.ft for filetypes
+          local excluded = vim.tbl_filter(function(ending)
+            return filepath:match(ending)
+          end, {
+            ".*%.min.js",
+            ".*%.sql",
+            ".*%.xml",
+          })
+          if not vim.tbl_isempty(excluded) then
+            putils.set_preview_message(
+              bufnr,
+              opts.winid,
+              string.format("I don't like %s files!",
+                excluded[1]:sub(5, -1))
+            )
+            return false
+          end
+          return true
+        end,
+        filesize_hook = function(filepath, bufnr, opts)
+          local path = require("plenary.path"):new(filepath)
+          -- opts exposes winid
+          local height = vim.api.nvim_win_get_height(opts.winid)
+          local lines = vim.split(path:head(height), "[\r]?\n")
+          vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+        end,
+      },
+    },
     mappings = {
       i = {
         ['<C-u>'] = false,
@@ -321,8 +378,9 @@ require('telescope').setup {
       },
     },
     file_ignore_patterns = {
-      "%.min.js$",
-      "%.sql$",
+      "%.min.js",
+      "%.sql",
+      "%.xml",
     },
   },
 }
@@ -337,6 +395,7 @@ require("marks").setup(
     }
   }
 )
+require("mini.indentscope").setup()
 require('netrw').setup()
 vim.cmd("colorscheme kanagawa-wave")
 
