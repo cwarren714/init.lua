@@ -65,6 +65,10 @@ require('lazy').setup({
         vim.keymap.set('n', '<leader>nh', function()
           require("gitsigns").nav_hunk('next', { buffer = bufnr, preview = true })
         end)
+        -- reset hunk
+        vim.keymap.set('n', '<leader>rh', function()
+          require("gitsigns").reset_hunk()
+        end)
       end,
     },
   },
@@ -73,7 +77,7 @@ require('lazy').setup({
     'nvim-lualine/lualine.nvim',
     opts = {
       options = {
-        icons_enabled = false,
+        icons_enabled = true,
         theme = 'onedark',
         component_separators = '|',
         section_separators = '',
@@ -96,23 +100,29 @@ require('lazy').setup({
     'numToStr/Comment.nvim',
     opts = {}
   },
-
-  -- Fuzzy Finder (files, lsp, etc)
   {
-    'nvim-telescope/telescope.nvim',
-    branch = '0.1.x',
+    'ibhagwan/fzf-lua',
     dependencies = {
-      'nvim-lua/plenary.nvim',
-      {
-        'nvim-telescope/telescope-fzf-native.nvim',
-        build = 'make',
-        cond = function()
-          return vim.fn.executable 'make' == 1
-        end,
-      },
+      'nvim-tree/nvim-web-devicons',
+      'nvim-lua/plenary.nvim'
     },
+    config = function()
+      require('fzf-lua').setup({
+        "telescope",
+        grep = {
+          cmd = "rg --vimgrep --hidden --column --line-number --no-heading --color=always --smart-case"
+              .. " -g '!.git/'"
+              .. " -g '!node_modules/'"
+              .. " -g '!*.min.*'"
+              .. " -g '!*.sql'"
+              .. " -g '!*.xml'"
+              .. " -g '!*.svg'",
+          debug = true,
+        },
+        winopts = {},
+      })
+    end
   },
-
   {
     -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
@@ -288,15 +298,20 @@ vim.keymap.set('n', '<leader>pd', ':lua require("neogen").generate()<cr>')
 -- return to last buffer with leader l
 vim.keymap.set({ "n", "v" }, "<leader>l", "<C-6>")
 
--- todos in telescope or quickfix
-vim.keymap.set('n', '<leader>td', '<cmd>TodoTelescope<CR>')
-vim.keymap.set('n', '<leader>tdq', '<cmd>TodoQuickFix<CR>')
+vim.keymap.set('n', '<leader>td', '<cmd>TodoTelescope<CR>', { desc = '[T]odo [D]ocument (fzf-lua)' })
+vim.keymap.set('n', '<leader>tdq', '<cmd>TodoQuickFix<CR>', { desc = '[T]odo [D]ocument [Q]uickfix' })
+
+-- search only in visual selection when in visual mode
+vim.keymap.set("x", "/", "<Esc>/\\%V")
 
 -- trying to format doc on save
-vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
-
--- format with leader space
--- vim.keymap.set('n', '<leader><space>', '<cmd>lua vim.lsp.buf.format()<CR>')
+-- vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
+--
+-- Format selection in visual mode
+vim.keymap.set("v", "<leader><space>", function()
+  vim.lsp.buf.format({ async = true })
+  vim.cmd("normal! <Esc>")
+end, { desc = 'Format visual selection' })
 
 --quickfix command shortcuts
 vim.keymap.set('n', '<leader>qn', ':cnext<CR>')
@@ -338,53 +353,6 @@ vim.keymap.set("n", "<leader>t", "<cmd>TestNearest<CR>")
 vim.keymap.set("n", "<leader>tf", "<cmd>TestFile<CR>")
 vim.keymap.set("n", "<leader>ts", "<cmd>TestSuite<CR>")
 
-require('telescope').setup {
-  defaults = {
-    preview = {
-      hooks = {
-        filetype_hook = function(filepath, bufnr, opts)
-          -- you could analogously check opts.ft for filetypes
-          local excluded = vim.tbl_filter(function(ending)
-            return filepath:match(ending)
-          end, {
-            ".*%.min.js",
-            ".*%.sql",
-            ".*%.xml",
-          })
-          if not vim.tbl_isempty(excluded) then
-            putils.set_preview_message(
-              bufnr,
-              opts.winid,
-              string.format("I don't like %s files!",
-                excluded[1]:sub(5, -1))
-            )
-            return false
-          end
-          return true
-        end,
-        filesize_hook = function(filepath, bufnr, opts)
-          local path = require("plenary.path"):new(filepath)
-          -- opts exposes winid
-          local height = vim.api.nvim_win_get_height(opts.winid)
-          local lines = vim.split(path:head(height), "[\r]?\n")
-          vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
-        end,
-      },
-    },
-    mappings = {
-      i = {
-        ['<C-u>'] = false,
-        ['<C-d>'] = false,
-      },
-    },
-    file_ignore_patterns = {
-      "%.min.js",
-      "%.sql",
-      "%.xml",
-    },
-  },
-}
-
 require("nvim-surround").setup()
 require("marks").setup(
   {
@@ -399,23 +367,17 @@ require("mini.indentscope").setup()
 require('netrw').setup()
 vim.cmd("colorscheme kanagawa-wave")
 
--- Enable telescope fzf native, if installed
-pcall(require('telescope').load_extension, 'fzf')
-vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
-vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers, { desc = '[ ] Find existing buffers' })
-vim.keymap.set('n', '<leader>/', function()
-  require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-    winblend = 10,
-    previewer = false,
-  })
-end, { desc = '[/] Fuzzily search in current buffer' })
-vim.keymap.set('n', '<leader>gf', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
-vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
-vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags, { desc = '[S]earch [H]elp' })
--- vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
-vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
-vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
-vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [R]esume' })
+local fzf = require('fzf-lua')
+vim.keymap.set('n', '<leader>?', fzf.oldfiles, { desc = '[?] Find recently opened files' })
+-- vim.keymap.set('n', '<leader><space>', fzf.buffers, { desc = '[ ] Find existing buffers' })
+vim.keymap.set('n', '<leader>/', fzf.blines, { desc = '[/] Fuzzily search in current buffer lines' })
+vim.keymap.set('n', '<leader>gf', fzf.git_files, { desc = 'Search [G]it [F]iles' })
+vim.keymap.set('n', '<leader>sf', fzf.files, { desc = '[S]earch [F]iles' })
+vim.keymap.set('n', '<leader>sh', fzf.help_tags, { desc = '[S]earch [H]elp' })
+-- vim.keymap.set('n', '<leader>sw', fzf.grep_cword, { desc = '[S]earch current [W]ord' })
+vim.keymap.set('n', '<leader>sg', fzf.live_grep, { desc = '[S]earch by [G]rep' })
+vim.keymap.set('n', '<leader>sd', fzf.diagnostics_document, { desc = '[S]earch [D]ocument Diagnostics' })
+vim.keymap.set('n', '<leader>sr', fzf.resume, { desc = '[S]earch [R]esume' })
 
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
@@ -482,7 +444,7 @@ vim.defer_fn(function()
   }
 end, 0)
 
--- Diagnostic keymap
+-- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
@@ -493,24 +455,20 @@ local on_attach = function(_, bufnr)
     if desc then
       desc = 'LSP: ' .. desc
     end
-
-    vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
+    vim.keymap.set('n', keys, func, { buffer = bufnr, noremap = true, silent = true, desc = desc })
   end
 
-  -- LSP Keymappings
+  local fzf_lsp = require('fzf-lua')
   nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
   nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
-  -- opens in a vertical split
-  nmap('gd', "<cmd>lua require('telescope.builtin').lsp_definitions({ jump_type = 'vsplit' })<CR>", '[G]oto [D]efinition')
-  nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-  nmap('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-  nmap('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
-  nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-  nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+  nmap('gd', function() fzf_lsp.lsp_definitions() end, '[G]oto [D]efinition')
+  nmap('gr', function() fzf_lsp.lsp_references() end, '[G]oto [R]eferences')
+  nmap('gI', function() fzf_lsp.lsp_implementations() end, '[G]oto [I]mplementation')
+  nmap('<leader>D', function() fzf_lsp.lsp_type_definitions() end, 'Type [D]efinition')
+  nmap('<leader>ds', function() fzf_lsp.lsp_document_symbols() end, '[D]ocument [S]ymbols')
+  nmap('<leader>ws', function() fzf_lsp.lsp_workspace_symbols() end, '[W]orkspace [S]ymbols')
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
   nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
-
-  -- Lesser used LSP functionality
   nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
   nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
   nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
@@ -518,7 +476,7 @@ local on_attach = function(_, bufnr)
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   end, '[W]orkspace [L]ist Folders')
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
-    vim.lsp.buf.format()
+    vim.lsp.buf.format({ async = true })
   end, { desc = 'Format current buffer with LSP' })
 end
 
@@ -534,7 +492,7 @@ local servers = {
       workspace = { checkThirdParty = false },
       telemetry = { enable = false },
       diagnostics = {
-        globals = { 'vim', 'use' },
+        globals = { 'vim', 'use', 'require' },
       }
     },
   },
@@ -566,81 +524,26 @@ require('lspconfig').intelephense.setup {
   end,
   settings = {
     intelephense = {
-      -- stubs including wordpress
       stubs = {
-        "apache",
-        "bcmath",
-        "bz2",
-        "calendar",
-        "com_dotnet",
-        "Core",
-        "ctype",
-        "curl",
-        "date",
-        "dba",
-        "dom",
-        "enchant",
-        "exif",
-        "FFI",
-        "fileinfo",
-        "filter",
-        "fpm",
-        "ftp",
-        "gd",
-        "gettext",
-        "gmp",
-        "hash",
-        "iconv",
-        "imap",
-        "intl",
-        "json",
-        "ldap",
-        "libxml",
-        "mbstring",
-        "meta",
-        "mysqli",
-        "oci8",
-        "odbc",
-        "openssl",
-        "pcntl",
-        "pcre",
-        "PDO",
-        "pdo_ibm",
-        "pdo_mysql",
-        "pdo_pgsql",
-        "pdo_sqlite",
-        "pgsql",
-        "Phar",
-        "posix",
-        "pspell",
-        "readline",
-        "Reflection",
-        "session",
-        "shmop",
-        "SimpleXML",
-        "snmp",
-        "soap",
-        "sockets",
-        "sodium",
-        "SPL",
-        "sqlite3",
-        "standard",
-        "superglobals",
-        "sysvmsg",
-        "sysvsem",
-        "sysvshm",
-        "tidy",
-        "tokenizer",
-        "xml",
-        "xmlreader",
-        "xmlrpc",
-        "xmlwriter",
-        "wordpress",
-        "xsl",
-        "Zend OPcache",
-        "zip",
-        "zlib",
-        "gettext"
+        "apache", "bcmath", "bz2", "calendar", "com_dotnet", "Core",
+        "ctype", "curl", "date", "dba", "dom", "enchant", "exif", "FFI",
+        "fileinfo", "filter", "fpm", "ftp", "gd", "gettext", "gmp", "hash",
+        "iconv", "imap", "intl", "json", "ldap", "libxml", "mbstring", "meta",
+        "mysqli", "oci8", "odbc", "openssl", "pcntl", "pcre", "PDO",
+        "pdo_ibm", "pdo_mysql", "pdo_pgsql", "pdo_sqlite", "pgsql", "Phar",
+        "posix", "pspell", "readline", "Reflection", "session", "shmop",
+        "SimpleXML", "snmp", "soap", "sockets", "sodium", "SPL", "sqlite3",
+        "standard", "superglobals", "sysvmsg", "sysvsem", "sysvshm", "tidy",
+        "tokenizer", "xml", "xmlreader", "xmlrpc", "xmlwriter", "wordpress",
+        "xsl", "Zend OPcache", "zip", "zlib", "gettext"
+      },
+      environment = {},
+      files = {
+        exclude = {
+          "**/.git/**",
+          "**/node_modules/**",
+          "**/vendor/**",
+        }
       }
     }
   },
@@ -680,33 +583,54 @@ cmp.setup {
   sources = {
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
+    { name = 'buffer' },
+    { name = 'path' },
   },
 }
+
 function Remove_qf_item()
   local curqfidx = vim.fn.line('.')
-  local qfall = vim.fn.getqflist()
+  local qfall = vim.fn.getqflist({ idx = 0, items = 0 }).items
 
-  -- Return if there are no items to remove
-  if #qfall == 0 then return end
+  if not qfall or #qfall == 0 then return end
+  if curqfidx <= 0 or curqfidx > #qfall then
+    print("Invalid quickfix item index")
+    return
+  end
 
   -- Remove the item from the quickfix list
   table.remove(qfall, curqfidx)
-  vim.fn.setqflist(qfall, 'r')
 
-  -- Reopen quickfix window to refresh the list
-  vim.cmd('copen')
+  -- Get the current quickfix list properties
+  local qfinfo = vim.fn.getqflist({ title = 1 })
+  local qftitle = qfinfo and qfinfo.title or ""
 
-  -- If not at the end of the list, stay at the same index, otherwise, go one up.
-  local new_idx = curqfidx < #qfall and curqfidx or math.max(curqfidx - 1, 1)
+  -- Set the modified list back, preserving the title
+  vim.fn.setqflist(qfall, 'r', { title = qftitle })
 
-  -- Set the cursor position directly in the quickfix window
-  local winid = vim.fn.win_getid() -- Get the window ID of the quickfix window
-  vim.api.nvim_win_set_cursor(winid, { new_idx, 0 })
+  -- If the quickfix window is open, refresh and move cursor
+  local qf_winid = vim.fn.getqflist({ winid = 0 }).winid
+  if qf_winid ~= 0 and vim.api.nvim_win_is_valid(qf_winid) then
+    vim.cmd.copen()
+    local new_total = #qfall
+    local new_idx = curqfidx
+    if new_total == 0 then
+      return
+    elseif curqfidx > new_total then
+      new_idx = new_total
+    end
+    -- Set cursor position in the quickfix window
+    vim.api.nvim_win_set_cursor(qf_winid, { new_idx, 0 })
+  end
 end
 
 -- quickfix list delete keymap bound to "dd" when hovering over item in quickfix list
-vim.cmd("command! RemoveQFItem lua Remove_qf_item()")
-vim.api.nvim_command("autocmd FileType qf nnoremap <buffer> dd :RemoveQFItem<cr>")
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "qf",
+  callback = function()
+    vim.keymap.set('n', 'dd', Remove_qf_item, { buffer = true, silent = true, desc = "Delete item from quickfix list" })
+  end
+})
 
 -- remove underline from spelling errors
 vim.api.nvim_set_hl(0, "SpellBad", { undercurl = false })
