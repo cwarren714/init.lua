@@ -310,7 +310,6 @@ vim.keymap.set("x", "/", "<Esc>/\\%V")
 -- Format selection in visual mode
 vim.keymap.set("v", "<leader><space>", function()
   vim.lsp.buf.format({ async = true })
-  vim.cmd("normal! <Esc>")
 end, { desc = 'Format visual selection' })
 
 --quickfix command shortcuts
