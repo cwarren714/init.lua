@@ -538,13 +538,6 @@ require('lspconfig').intelephense.setup {
         "xsl", "Zend OPcache", "zip", "zlib", "gettext"
       },
       environment = {},
-      files = {
-        exclude = {
-          "**/.git/**",
-          "**/node_modules/**",
-          "**/vendor/**",
-        }
-      }
     }
   },
   filetypes = { 'php' }
