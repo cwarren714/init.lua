@@ -218,7 +218,14 @@ require('lazy').setup({
       hl(0, "MultiCursorDisabledVisual", { link = "Visual" })
       hl(0, "MultiCursorDisabledSign", { link = "SignColumn" })
     end
-  }
+  },
+  -- {
+  --   dir = "~/.config/nvim/stock_tracker",
+  --   lazy = false,
+  --   config = function()
+  --     require("init").setup({})
+  --   end,
+  -- }
 }, {})
 
 -- [[ OPTIONS ]]
@@ -308,7 +315,7 @@ vim.keymap.set("x", "/", "<Esc>/\\%V")
 -- vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
 --
 -- Format selection in visual mode
-vim.keymap.set("v", "<leader><space>", function()
+vim.keymap.set({ "v", "n" }, "<leader><space>", function()
   vim.lsp.buf.format({ async = true })
 end, { desc = 'Format visual selection' })
 
@@ -534,9 +541,12 @@ require('lspconfig').intelephense.setup {
         "SimpleXML", "snmp", "soap", "sockets", "sodium", "SPL", "sqlite3",
         "standard", "superglobals", "sysvmsg", "sysvsem", "sysvshm", "tidy",
         "tokenizer", "xml", "xmlreader", "xmlrpc", "xmlwriter", "wordpress",
-        "xsl", "Zend OPcache", "zip", "zlib", "gettext"
+        "xsl", "Zend OPcache", "zip", "zlib"
       },
-      environment = {},
+      -- increase file max size so it can read stubs like gravityforms
+      files = {
+        maxSize = 5242880
+      }
     }
   },
   filetypes = { 'php' }
