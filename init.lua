@@ -219,13 +219,6 @@ require('lazy').setup({
       hl(0, "MultiCursorDisabledSign", { link = "SignColumn" })
     end
   },
-  -- {
-  --   dir = "~/.config/nvim/stock_tracker",
-  --   lazy = false,
-  --   config = function()
-  --     require("init").setup({})
-  --   end,
-  -- }
 }, {})
 
 -- [[ OPTIONS ]]
@@ -254,6 +247,7 @@ vim.o.foldmethod = "expr"
 vim.o.foldexpr = "nvim_treesitter#foldexpr()"
 vim.o.foldlevel = 99
 vim.o.foldtext = "v:lua.Fold_text()"
+vim.o.autoread = true
 
 function Fold_text()
   local line = vim.fn.getline(vim.v.foldstart)
