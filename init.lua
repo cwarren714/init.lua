@@ -118,7 +118,7 @@ require('lazy').setup({
               .. " -g '!*.sql'"
               .. " -g '!*.xml'"
               .. " -g '!*.svg'",
-          debug = true,
+          debug = false,
         },
         winopts = {},
       })
@@ -446,8 +446,6 @@ vim.defer_fn(function()
 end, 0)
 
 -- Diagnostic keymaps
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
@@ -459,15 +457,14 @@ local on_attach = function(_, bufnr)
     vim.keymap.set('n', keys, func, { buffer = bufnr, noremap = true, silent = true, desc = desc })
   end
 
-  local fzf_lsp = require('fzf-lua')
   nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
   nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
-  nmap('gd', function() fzf_lsp.lsp_definitions() end, '[G]oto [D]efinition')
-  nmap('gr', function() fzf_lsp.lsp_references() end, '[G]oto [R]eferences')
-  nmap('gI', function() fzf_lsp.lsp_implementations() end, '[G]oto [I]mplementation')
-  nmap('<leader>D', function() fzf_lsp.lsp_type_definitions() end, 'Type [D]efinition')
-  nmap('<leader>ds', function() fzf_lsp.lsp_document_symbols() end, '[D]ocument [S]ymbols')
-  nmap('<leader>ws', function() fzf_lsp.lsp_workspace_symbols() end, '[W]orkspace [S]ymbols')
+  nmap('gd', function() require('fzf-lua').lsp_definitions() end, '[G]oto [D]efinition')
+  nmap('gr', function() require('fzf-lua').lsp_references() end, '[G]oto [R]eferences')
+  nmap('gI', function() require('fzf-lua').lsp_implementations() end, '[G]oto [I]mplementation')
+  nmap('<leader>D', function() require('fzf-lua').lsp_type_definitions() end, 'Type [D]efinition')
+  nmap('<leader>ds', function() require('fzf-lua').lsp_document_symbols() end, '[D]ocument [S]ymbols')
+  nmap('<leader>ws', function() require('fzf-lua').lsp_workspace_symbols() end, '[W]orkspace [S]ymbols')
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
   nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
   nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
@@ -487,6 +484,7 @@ local servers = {
   -- rust_analyzer = {},
   html = { filetypes = { 'html', 'twig', 'hbs' } },
   intelephense = {},
+  ts_ls = {},
   lua_ls = {
     Lua = {
       workspace = { checkThirdParty = false },
