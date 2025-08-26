@@ -220,6 +220,161 @@ require('lazy').setup({
       hl(0, "MultiCursorDisabledSign", { link = "SignColumn" })
     end
   },
+  -- LSP Plugins
+  {
+    'folke/lazydev.nvim',
+    ft = 'lua',
+    opts = {
+      library = {
+        { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+      },
+    },
+  },
+  {
+    -- Main LSP Configuration
+    'neovim/nvim-lspconfig',
+    dependencies = {
+      { 'mason-org/mason.nvim', opts = {} },
+      'mason-org/mason-lspconfig.nvim',
+      'WhoIsSethDaniel/mason-tool-installer.nvim',
+      { 'j-hui/fidget.nvim',    opts = {} },
+      'saghen/blink.cmp',
+    },
+    config = function()
+      vim.api.nvim_create_autocmd('LspAttach', {
+        group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
+        callback = function(event)
+          local map = function(keys, func, desc, mode)
+            mode = mode or 'n'
+            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
+          end
+          map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
+          map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
+          map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+          map('gd', function() require('fzf-lua').lsp_definitions() end, '[G]oto [D]efinition')
+          map('gr', function() require('fzf-lua').lsp_references() end, '[G]oto [R]eferences')
+          local function client_supports_method(client, method, bufnr)
+            if vim.fn.has 'nvim-0.11' == 1 then
+              return client:supports_method(method, bufnr)
+            else
+              return client.supports_method(method, { bufnr = bufnr })
+            end
+          end
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
+            local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
+            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+              buffer = event.buf,
+              group = highlight_augroup,
+              callback = vim.lsp.buf.document_highlight,
+            })
+
+            vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+              buffer = event.buf,
+              group = highlight_augroup,
+              callback = vim.lsp.buf.clear_references,
+            })
+
+            vim.api.nvim_create_autocmd('LspDetach', {
+              group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
+              callback = function(event2)
+                vim.lsp.buf.clear_references()
+                vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
+              end,
+            })
+          end
+          if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
+            map('<leader>th', function()
+              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
+            end, '[T]oggle Inlay [H]ints')
+          end
+        end,
+      })
+
+      -- Diagnostic Config
+      vim.diagnostic.config {
+        severity_sort = true,
+        float = { border = 'rounded', source = 'if_many' },
+        underline = { severity = vim.diagnostic.severity.ERROR },
+        signs = vim.g.have_nerd_font and {
+          text = {
+            [vim.diagnostic.severity.ERROR] = '󰅚 ',
+            [vim.diagnostic.severity.WARN] = '󰀪 ',
+            [vim.diagnostic.severity.INFO] = '󰋽 ',
+            [vim.diagnostic.severity.HINT] = '󰌶 ',
+          },
+        } or {},
+        virtual_text = {
+          source = 'if_many',
+          spacing = 2,
+          format = function(diagnostic)
+            local diagnostic_message = {
+              [vim.diagnostic.severity.ERROR] = diagnostic.message,
+              [vim.diagnostic.severity.WARN] = diagnostic.message,
+              [vim.diagnostic.severity.INFO] = diagnostic.message,
+              [vim.diagnostic.severity.HINT] = diagnostic.message,
+            }
+            return diagnostic_message[diagnostic.severity]
+          end,
+        },
+      }
+
+      local capabilities = require('blink.cmp').get_lsp_capabilities()
+      local servers = {
+        lua_ls = {
+          settings = {
+            Lua = {
+              completion = {
+                callSnippet = 'Replace',
+              },
+            },
+          },
+        },
+        intelephense = {
+          capabilities = capabilities,
+          root_dir = function()
+            return vim.loop.cwd()
+          end,
+          settings = {
+            intelephense = {
+              stubs = {
+                "apache", "bcmath", "bz2", "calendar", "com_dotnet", "Core",
+                "ctype", "curl", "date", "dba", "dom", "enchant", "exif", "FFI",
+                "fileinfo", "filter", "fpm", "ftp", "gd", "gettext", "gmp", "hash",
+                "iconv", "imap", "intl", "json", "ldap", "libxml", "mbstring", "meta",
+                "mysqli", "oci8", "odbc", "openssl", "pcntl", "pcre", "PDO",
+                "pdo_ibm", "pdo_mysql", "pdo_pgsql", "pdo_sqlite", "pgsql", "Phar",
+                "posix", "pspell", "readline", "Reflection", "session", "shmop",
+                "SimpleXML", "snmp", "soap", "sockets", "sodium", "SPL", "sqlite3",
+                "standard", "superglobals", "sysvmsg", "sysvsem", "sysvshm", "tidy",
+                "tokenizer", "xml", "xmlreader", "xmlrpc", "xmlwriter", "wordpress",
+                "xsl", "Zend OPcache", "zip", "zlib", "gettext"
+              },
+              environment = {},
+            }
+          },
+          filetypes = { 'php' }
+        }
+      }
+
+      local ensure_installed = vim.tbl_keys(servers or {})
+      vim.list_extend(ensure_installed, {
+        'stylua',
+      })
+      require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+      require('mason-lspconfig').setup {
+        ensure_installed = {},
+        automatic_installation = false,
+        handlers = {
+          function(server_name)
+            local server = servers[server_name] or {}
+            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+            require('lspconfig')[server_name].setup(server)
+          end,
+        },
+      }
+    end,
+  },
 }, {})
 
 -- [[ OPTIONS ]]
@@ -308,11 +463,11 @@ vim.keymap.set("x", "/", "<Esc>/\\%V")
 
 -- trying to format doc on save
 -- vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
---
--- Format selection in visual mode
-vim.keymap.set({ "v", "n" }, "<leader><space>", function()
+
+-- Format selection 
+vim.keymap.set({ "n", "v" }, "<leader><space>", function()
   vim.lsp.buf.format({ async = true })
-end, { desc = 'Format visual selection' })
+end)
 
 --quickfix command shortcuts
 vim.keymap.set('n', '<leader>qn', ':cnext<CR>')
@@ -448,137 +603,6 @@ end, 0)
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
-
-local on_attach = function(_, bufnr)
-  local nmap = function(keys, func, desc)
-    if desc then
-      desc = 'LSP: ' .. desc
-    end
-    vim.keymap.set('n', keys, func, { buffer = bufnr, noremap = true, silent = true, desc = desc })
-  end
-
-  nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-  nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
-  nmap('gd', function() require('fzf-lua').lsp_definitions() end, '[G]oto [D]efinition')
-  nmap('gr', function() require('fzf-lua').lsp_references() end, '[G]oto [R]eferences')
-  nmap('gI', function() require('fzf-lua').lsp_implementations() end, '[G]oto [I]mplementation')
-  nmap('<leader>D', function() require('fzf-lua').lsp_type_definitions() end, 'Type [D]efinition')
-  nmap('<leader>ds', function() require('fzf-lua').lsp_document_symbols() end, '[D]ocument [S]ymbols')
-  nmap('<leader>ws', function() require('fzf-lua').lsp_workspace_symbols() end, '[W]orkspace [S]ymbols')
-  nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
-  nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-  nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
-  nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
-  nmap('<leader>wl', function()
-    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-  end, '[W]orkspace [L]ist Folders')
-  vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
-    vim.lsp.buf.format({ async = true })
-  end, { desc = 'Format current buffer with LSP' })
-end
-
-require('mason').setup()
-local servers = {
-  -- gopls will fail install when go isn't installed, it's fine
-  -- rust_analyzer = {},
-  html = { filetypes = { 'html', 'twig', 'hbs' } },
-  intelephense = {},
-  ts_ls = {},
-  lua_ls = {
-    Lua = {
-      workspace = { checkThirdParty = false },
-      telemetry = { enable = false },
-      diagnostics = {
-        globals = { 'vim', 'use', 'require' },
-      }
-    },
-  },
-}
-
-require('neodev').setup()
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
-require('mason-lspconfig').setup {
-  ensure_installed = vim.tbl_keys(servers),
-  automatic_installation = true,
-}
-
-for server_name, _ in pairs(servers) do
-  require('lspconfig')[server_name].setup {
-    capabilities = capabilities,
-    on_attach = on_attach,
-    settings = servers[server_name],
-    filetypes = (servers[server_name] or {}).filetypes,
-  }
-end
-require('lspconfig').intelephense.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-  root_dir = function()
-    return vim.loop.cwd()
-  end,
-  settings = {
-    intelephense = {
-      stubs = {
-        "apache", "bcmath", "bz2", "calendar", "com_dotnet", "Core",
-        "ctype", "curl", "date", "dba", "dom", "enchant", "exif", "FFI",
-        "fileinfo", "filter", "fpm", "ftp", "gd", "gettext", "gmp", "hash",
-        "iconv", "imap", "intl", "json", "ldap", "libxml", "mbstring", "meta",
-        "mysqli", "oci8", "odbc", "openssl", "pcntl", "pcre", "PDO",
-        "pdo_ibm", "pdo_mysql", "pdo_pgsql", "pdo_sqlite", "pgsql", "Phar",
-        "posix", "pspell", "readline", "Reflection", "session", "shmop",
-        "SimpleXML", "snmp", "soap", "sockets", "sodium", "SPL", "sqlite3",
-        "standard", "superglobals", "sysvmsg", "sysvsem", "sysvshm", "tidy",
-        "tokenizer", "xml", "xmlreader", "xmlrpc", "xmlwriter", "wordpress",
-        "xsl", "Zend OPcache", "zip", "zlib"
-      },
-      -- increase file max size so it can read stubs like gravityforms
-      files = {
-        maxSize = 5242880
-      }
-    }
-  },
-  filetypes = { 'php' }
-}
-
-local cmp = require 'cmp'
-local luasnip = require 'luasnip'
-require('luasnip.loaders.from_vscode').lazy_load()
-luasnip.config.setup {}
-cmp.setup {
-  snippet = {
-    expand = function(args)
-      luasnip.lsp_expand(args.body)
-    end,
-  },
-  mapping = cmp.mapping.preset.insert {
-    ['<C-n>'] = cmp.mapping.select_next_item(),
-    ['<C-p>'] = cmp.mapping.select_prev_item(),
-    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete {},
-    ['<CR>'] = cmp.mapping.confirm {
-      behavior = cmp.ConfirmBehavior.Replace,
-      select = true,
-    },
-    ['<S-Tab>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
-      elseif luasnip.expand_or_locally_jumpable() then
-        luasnip.expand_or_jump()
-      else
-        fallback()
-      end
-    end, { 'i', 's' }),
-  },
-  sources = {
-    { name = 'nvim_lsp' },
-    { name = 'luasnip' },
-    { name = 'buffer' },
-    { name = 'path' },
-  },
-}
 
 function Remove_qf_item()
   local curqfidx = vim.fn.line('.')
