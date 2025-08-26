@@ -233,6 +233,8 @@ require('lazy').setup({
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
+    event = "VeryLazy",
+    cmd = { 'LspInfo', 'LspInstall', 'LspUninstall' },
     dependencies = {
       { 'mason-org/mason.nvim', opts = {} },
       'mason-org/mason-lspconfig.nvim',
@@ -321,58 +323,61 @@ require('lazy').setup({
 
       local capabilities = require('blink.cmp').get_lsp_capabilities()
       local servers = {
-        lua_ls = {
-          settings = {
-            Lua = {
-              completion = {
-                callSnippet = 'Replace',
+        mason = {
+          lua_ls = {
+            settings = {
+              Lua = {
+                completion = {
+                  callSnippet = 'Replace',
+                },
               },
             },
           },
+          intelephense = {
+            init_options = {
+              globalStoragePath = vim.fn.expand('~/.local/share/nvim/intelephense'),
+            },
+            settings = {
+              intelephense = {
+                stubs = {
+                  "apache", "bcmath", "bz2", "calendar", "com_dotnet", "Core",
+                  "ctype", "curl", "date", "dba", "dom", "enchant", "exif", "FFI",
+                  "fileinfo", "filter", "fpm", "ftp", "gd", "gettext", "gmp", "hash",
+                  "iconv", "imap", "intl", "json", "ldap", "libxml", "mbstring", "meta",
+                  "mysqli", "oci8", "odbc", "openssl", "pcntl", "pcre", "PDO",
+                  "pdo_ibm", "pdo_mysql", "pdo_pgsql", "pdo_sqlite", "pgsql", "Phar",
+                  "posix", "pspell", "readline", "Reflection", "session", "shmop",
+                  "SimpleXML", "snmp", "soap", "sockets", "sodium", "SPL", "sqlite3",
+                  "standard", "superglobals", "sysvmsg", "sysvsem", "sysvshm", "tidy",
+                  "tokenizer", "xml", "xmlreader", "xmlrpc", "xmlwriter", "wordpress",
+                  "xsl", "Zend OPcache", "zip", "zlib"
+                },
+              }
+            },
+          }
         },
-        intelephense = {
-          capabilities = capabilities,
-          root_dir = function()
-            return vim.loop.cwd()
-          end,
-          settings = {
-            intelephense = {
-              stubs = {
-                "apache", "bcmath", "bz2", "calendar", "com_dotnet", "Core",
-                "ctype", "curl", "date", "dba", "dom", "enchant", "exif", "FFI",
-                "fileinfo", "filter", "fpm", "ftp", "gd", "gettext", "gmp", "hash",
-                "iconv", "imap", "intl", "json", "ldap", "libxml", "mbstring", "meta",
-                "mysqli", "oci8", "odbc", "openssl", "pcntl", "pcre", "PDO",
-                "pdo_ibm", "pdo_mysql", "pdo_pgsql", "pdo_sqlite", "pgsql", "Phar",
-                "posix", "pspell", "readline", "Reflection", "session", "shmop",
-                "SimpleXML", "snmp", "soap", "sockets", "sodium", "SPL", "sqlite3",
-                "standard", "superglobals", "sysvmsg", "sysvsem", "sysvshm", "tidy",
-                "tokenizer", "xml", "xmlreader", "xmlrpc", "xmlwriter", "wordpress",
-                "xsl", "Zend OPcache", "zip", "zlib", "gettext"
-              },
-              environment = {},
-            }
-          },
-          filetypes = { 'php' }
-        }
+        others = {}
       }
 
-      local ensure_installed = vim.tbl_keys(servers or {})
+      local ensure_installed = vim.tbl_keys(servers.mason or {})
       vim.list_extend(ensure_installed, {
         'stylua',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+
+      for server, config in pairs(vim.tbl_extend('keep', servers.mason, servers.others)) do
+        config.capabilities = vim.tbl_deep_extend('force', {}, capabilities, config.capabilities or {})
+        vim.lsp.config(server, config)
+      end
+
       require('mason-lspconfig').setup {
         ensure_installed = {},
-        automatic_installation = false,
-        handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
-          end,
-        },
+        automatic_enable = true,
       }
+
+      if not vim.tbl_isempty(servers.others) then
+        vim.lsp.enable(vim.tbl_keys(servers.others))
+      end
     end,
   },
 }, {})
@@ -464,7 +469,7 @@ vim.keymap.set("x", "/", "<Esc>/\\%V")
 -- trying to format doc on save
 -- vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
 
--- Format selection 
+-- Format selection
 vim.keymap.set({ "n", "v" }, "<leader><space>", function()
   vim.lsp.buf.format({ async = true })
 end)
