@@ -13,7 +13,6 @@ vim.o.winborder = "rounded"
 vim.o.smartcase = true
 vim.o.ignorecase = true
 
-
 -- shout out
 vim.keymap.set('n', '<leader>o', ':update<CR> :source<CR>')
 
@@ -68,15 +67,22 @@ vim.pack.add({
 	{ src = "https://github.com/neovim/nvim-lspconfig" },
 	{ src = "https://github.com/nvim-mini/mini.pick" },
 	{ src = "https://github.com/nvim-mini/mini.completion" },
+	{ src = "https://github.com/nvim-mini/mini.icons" },
+	{ src = "https://github.com/prichrd/netrw.nvim" },
 	{ src = "https://github.com/mason-org/mason.nvim" },
 	{ src = "https://github.com/lewis6991/gitsigns.nvim" },
 	{ src = "https://github.com/tpope/vim-fugitive" },
 	{ src = "https://github.com/vim-test/vim-test" },
+	{ src = "https://github.com/rose-pine/neovim" },
+	{ src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
 })
 
 require "mini.pick".setup()
 require "mini.completion".setup()
+require "mini.icons".setup()
+require "netrw".setup()
 require "mason".setup()
+require "rose-pine".setup()
 require "gitsigns".setup(
 	{
 		signs = {
@@ -101,8 +107,20 @@ require "gitsigns".setup(
 		end,
 	})
 
--- LSP --
-vim.lsp.enable({ "lua_ls", "intelephense" })
+-- note ts_ls requires presence of package manager file: 
+-- https://github.com/neovim/nvim-lspconfig/blob/master/lsp/ts_ls.lua#L61
+vim.lsp.enable({ "lua_ls", "intelephense", "ts_ls", "gopls" })
+
+-- treesitter
+require 'nvim-treesitter.configs'.setup {
+	ensure_installed = {"lua", "php", "typescript", "markdown", "html", "go"},
+	sync_install = false,
+	auto_install = true,
+	highlight = {
+		enable = true,
+		additional_vim_regex_highlighting = false,
+	},
+}
 
 -- more keymaps
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
@@ -120,3 +138,5 @@ vim.keymap.set('n', '<leader>sh', ":Pick help<CR>")
 vim.keymap.set('n', '<leader>lf', vim.lsp.buf.format)
 
 vim.keymap.set("n", "<leader>t", "<cmd>TestNearest<CR>")
+
+vim.cmd("colorscheme rose-pine-moon")
