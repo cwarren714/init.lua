@@ -77,7 +77,6 @@ vim.pack.add({
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
 })
 
--- require "mini.pick".setup()
 require "mini.completion".setup()
 require "mini.icons".setup()
 require "netrw".setup()
