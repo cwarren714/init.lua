@@ -74,7 +74,7 @@ vim.pack.add({
 	{ src = "https://github.com/tpope/vim-fugitive" },
 	{ src = "https://github.com/vim-test/vim-test" },
 	{ src = "https://github.com/rose-pine/neovim" },
-	{ src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
+	{ src = "https://github.com/nvim-treesitter/nvim-treesitter" },
 })
 
 require "mini.completion".setup()
@@ -106,19 +106,34 @@ require "gitsigns".setup(
 		end,
 	})
 
--- note ts_ls requires presence of package manager file: 
+-- note ts_ls requires presence of package manager file:
 -- https://github.com/neovim/nvim-lspconfig/blob/master/lsp/ts_ls.lua#L61
-vim.lsp.enable({ "lua_ls", "intelephense", "ts_ls", "gopls" })
+vim.lsp.enable({ "lua_ls", "ts_ls", "gopls" })
+require('lspconfig').intelephense.setup({
+	settings = {
+		intelephense = {
+			stubs = {
+				"apache", "bcmath", "bz2", "calendar", "com_dotnet", "Core", "ctype", "curl", "date",
+				"dba", "dom", "enchant", "exif", "FFI", "fileinfo", "filter", "fpm", "ftp", "gd",
+				"gettext", "gmp", "hash", "iconv", "imap", "intl", "json", "ldap", "libxml", "mbstring",
+				"meta", "mysqli", "oci8", "odbc", "openssl", "pcntl", "pcre", "PDO", "pdo_ibm",
+				"pdo_mysql", "pdo_pgsql", "pdo_sqlite", "pgsql", "Phar", "posix", "pspell", "readline",
+				"Reflection", "session", "shmop", "SimpleXML", "snmp", "soap", "sockets", "sodium",
+				"SPL", "sqlite3", "standard", "superglobals", "sysvmsg", "sysvsem", "sysvshm", "tidy",
+				"tokenizer", "xml", "xmlreader", "xmlrpc", "xmlwriter", "xsl", "Zend OPcache", "zip",
+				"zlib", "wordpress"
+			},
+		}
+	}
+})
 
--- treesitter
-require 'nvim-treesitter.configs'.setup {
-	ensure_installed = {"lua", "php", "typescript", "markdown", "html", "go"},
-	sync_install = false,
-	auto_install = true,
-	highlight = {
-		enable = true,
-		additional_vim_regex_highlighting = false,
-	},
+require'nvim-treesitter.configs'.setup {
+  sync_install = false,
+  auto_install = true,
+  highlight = {
+    enable = true,
+    additional_vim_regex_highlighting = false,
+  },
 }
 
 -- more keymaps
@@ -126,6 +141,7 @@ vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
 
 vim.keymap.set('n', 'gd', vim.lsp.buf.type_definition)
+vim.keymap.set('n', 'gr', vim.lsp.buf.references)
 vim.keymap.set('n', 'rn', vim.lsp.buf.rename)
 
 vim.keymap.set('n', '<leader>sf', ":FzfLua files<CR>")
@@ -133,8 +149,8 @@ vim.keymap.set('n', '<leader>/', ":FzfLua blines<CR>")
 vim.keymap.set('n', '<leader>sr', ":FzfLua resume<CR>")
 vim.keymap.set('n', '<leader>sd', ":FzfLua diagnostics_document<CR>")
 vim.keymap.set('n', '<leader>sh', ":FzfLua help_tags<CR>")
+vim.keymap.set('n', '<leader>sg', ":FzfLua live_grep_native<CR>")
 vim.keymap.set('n', 'gd', ":FzfLua lsp_definitions<CR>")
-vim.keymap.set('n', 'gr', ":FzfLua lsp_references<CR>")
 
 vim.keymap.set('n', '<leader>lf', vim.lsp.buf.format)
 
