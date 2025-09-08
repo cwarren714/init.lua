@@ -65,7 +65,7 @@ vim.keymap.set('n', '<leader>qo', ':copen<CR>')
 -- managing packages --
 vim.pack.add({
 	{ src = "https://github.com/neovim/nvim-lspconfig" },
-	{ src = "https://github.com/nvim-mini/mini.pick" },
+	{ src = "https://github.com/ibhagwan/fzf-lua" },
 	{ src = "https://github.com/nvim-mini/mini.completion" },
 	{ src = "https://github.com/nvim-mini/mini.icons" },
 	{ src = "https://github.com/prichrd/netrw.nvim" },
@@ -77,7 +77,7 @@ vim.pack.add({
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
 })
 
-require "mini.pick".setup()
+-- require "mini.pick".setup()
 require "mini.completion".setup()
 require "mini.icons".setup()
 require "netrw".setup()
@@ -126,14 +126,16 @@ require 'nvim-treesitter.configs'.setup {
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
 
-vim.keymap.set('n', 'gr', vim.lsp.buf.references)
-vim.keymap.set('n', 'gd', vim.lsp.buf.definition)
+vim.keymap.set('n', 'gd', vim.lsp.buf.type_definition)
 vim.keymap.set('n', 'rn', vim.lsp.buf.rename)
 
-vim.keymap.set('n', '<leader>sf', ":Pick files<CR>")
-vim.keymap.set('n', '<leader>sg', ":Pick grep_live<CR>")
-vim.keymap.set('n', '<leader>sr', ":Pick resume<CR>")
-vim.keymap.set('n', '<leader>sh', ":Pick help<CR>")
+vim.keymap.set('n', '<leader>sf', ":FzfLua files<CR>")
+vim.keymap.set('n', '<leader>/', ":FzfLua blines<CR>")
+vim.keymap.set('n', '<leader>sr', ":FzfLua resume<CR>")
+vim.keymap.set('n', '<leader>sd', ":FzfLua diagnostics_document<CR>")
+vim.keymap.set('n', '<leader>sh', ":FzfLua help_tags<CR>")
+vim.keymap.set('n', 'gd', ":FzfLua lsp_definitions<CR>")
+vim.keymap.set('n', 'gr', ":FzfLua lsp_references<CR>")
 
 vim.keymap.set('n', '<leader>lf', vim.lsp.buf.format)
 
