@@ -75,14 +75,17 @@ vim.pack.add({
 	{ src = "https://github.com/vim-test/vim-test" },
 	{ src = "https://github.com/rose-pine/neovim" },
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter" },
+	{ src = "https://github.com/danymat/neogen" },
+	{ src = "https://github.com/junegunn/vim-easy-align" },
 })
 
 require "mini.completion".setup()
-require "mini.icons".setup()
-require "netrw".setup()
-require "mason".setup()
-require "rose-pine".setup()
-require "gitsigns".setup(
+require "mini.icons"     .setup()
+require "netrw"          .setup()
+require "mason"          .setup()
+require "neogen"         .setup()
+require "rose-pine"      .setup()
+require "gitsigns"       .setup(
 	{
 		signs = {
 			add = { text = '+' },
@@ -131,7 +134,7 @@ require'nvim-treesitter.configs'.setup {
   sync_install = false,
   auto_install = true,
   highlight = {
-    enable = true,
+    enable                            = true,
     additional_vim_regex_highlighting = false,
   },
 }
@@ -145,15 +148,21 @@ vim.keymap.set('n', 'gr', vim.lsp.buf.references)
 vim.keymap.set('n', 'rn', vim.lsp.buf.rename)
 
 vim.keymap.set('n', '<leader>sf', ":FzfLua files<CR>")
-vim.keymap.set('n', '<leader>/', ":FzfLua blines<CR>")
+vim.keymap.set('n', '<leader>/',  ":FzfLua blines<CR>")
 vim.keymap.set('n', '<leader>sr', ":FzfLua resume<CR>")
 vim.keymap.set('n', '<leader>sd', ":FzfLua diagnostics_document<CR>")
 vim.keymap.set('n', '<leader>sh', ":FzfLua help_tags<CR>")
 vim.keymap.set('n', '<leader>sg', ":FzfLua live_grep_native<CR>")
-vim.keymap.set('n', 'gd', ":FzfLua lsp_definitions<CR>")
+vim.keymap.set('n', 'gd',         ":FzfLua lsp_definitions<CR>")
 
-vim.keymap.set('n', '<leader>lf', vim.lsp.buf.format)
+vim.keymap.set({'n', 'v'}, '<leader>lf', vim.lsp.buf.format)
 
 vim.keymap.set("n", "<leader>t", "<cmd>TestNearest<CR>")
+
+-- annotation like phpdoc
+vim.keymap.set('n', '<leader>pd', ':lua require("neogen").generate()<cr>')
+
+-- vim align keymaps
+vim.keymap.set('v', '<leader>a', '<Plug>(EasyAlign)')
 
 vim.cmd("colorscheme rose-pine-moon")
