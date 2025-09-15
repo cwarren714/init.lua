@@ -9,6 +9,8 @@ vim.o.hlsearch = false
 vim.o.spelllang = "en_us"
 vim.o.incsearch = true
 vim.o.smartindent = true
+vim.o.shiftwidth = 4
+vim.o.expandtab = true
 vim.o.winborder = "rounded"
 vim.o.smartcase = true
 vim.o.ignorecase = true
@@ -133,9 +135,13 @@ require('lspconfig').intelephense.setup({
 require'nvim-treesitter.configs'.setup {
   sync_install = false,
   auto_install = true,
+  ensure_installed = { "php", "lua", "javascript", "typescript", "go" },
   highlight = {
     enable                            = true,
     additional_vim_regex_highlighting = false,
+  },
+  indent = {
+    enable = true,
   },
 }
 
