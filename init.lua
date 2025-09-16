@@ -66,83 +66,82 @@ vim.keymap.set('n', '<leader>qo', ':copen<CR>')
 
 -- managing packages --
 vim.pack.add({
-	{ src = "https://github.com/neovim/nvim-lspconfig" },
-	{ src = "https://github.com/ibhagwan/fzf-lua" },
-	{ src = "https://github.com/nvim-mini/mini.completion" },
-	{ src = "https://github.com/nvim-mini/mini.icons" },
-	{ src = "https://github.com/prichrd/netrw.nvim" },
-	{ src = "https://github.com/mason-org/mason.nvim" },
-	{ src = "https://github.com/lewis6991/gitsigns.nvim" },
-	{ src = "https://github.com/tpope/vim-fugitive" },
-	{ src = "https://github.com/vim-test/vim-test" },
-	{ src = "https://github.com/rose-pine/neovim" },
-	{ src = "https://github.com/nvim-treesitter/nvim-treesitter" },
-	{ src = "https://github.com/danymat/neogen" },
-	{ src = "https://github.com/junegunn/vim-easy-align" },
+    { src = "https://github.com/neovim/nvim-lspconfig" },
+    { src = "https://github.com/ibhagwan/fzf-lua" },
+    { src = "https://github.com/nvim-mini/mini.completion" },
+    { src = "https://github.com/nvim-mini/mini.icons" },
+    { src = "https://github.com/prichrd/netrw.nvim" },
+    { src = "https://github.com/mason-org/mason.nvim" },
+    { src = "https://github.com/lewis6991/gitsigns.nvim" },
+    { src = "https://github.com/tpope/vim-fugitive" },
+    { src = "https://github.com/vim-test/vim-test" },
+    { src = "https://github.com/rose-pine/neovim" },
+    { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
+    { src = "https://github.com/danymat/neogen" },
+    { src = "https://github.com/junegunn/vim-easy-align" },
 })
 
 require "mini.completion".setup()
-require "mini.icons"     .setup()
-require "netrw"          .setup()
-require "mason"          .setup()
-require "neogen"         .setup()
-require "rose-pine"      .setup()
-require "gitsigns"       .setup(
-	{
-		signs = {
-			add = { text = '+' },
-			change = { text = '~' },
-			delete = { text = '_' },
-			topdelete = { text = '‾' },
-			changedelete = { text = '~' },
-		},
-		on_attach = function(bufnr)
-			-- preview hunk
-			vim.keymap.set('n', '<leader>ph', require('gitsigns').preview_hunk,
-				{ buffer = bufnr, desc = 'Preview git hunk' })
-			-- next hunk, auto previews
-			vim.keymap.set('n', '<leader>nh', function()
-				require("gitsigns").nav_hunk('next', { buffer = bufnr, preview = true })
-			end)
-			-- reset hunk
-			vim.keymap.set('n', '<leader>rh', function()
-				require("gitsigns").reset_hunk()
-			end)
-		end,
-	})
+require "mini.icons".setup()
+require "netrw".setup()
+require "mason".setup()
+require "neogen".setup()
+require "rose-pine".setup()
+require "gitsigns".setup(
+    {
+        signs = {
+            add = { text = '+' },
+            change = { text = '~' },
+            delete = { text = '_' },
+            topdelete = { text = '‾' },
+            changedelete = { text = '~' },
+        },
+        on_attach = function(bufnr)
+            -- preview hunk
+            vim.keymap.set('n', '<leader>ph', require('gitsigns').preview_hunk,
+                { buffer = bufnr, desc = 'Preview git hunk' })
+            -- next hunk, auto previews
+            vim.keymap.set('n', '<leader>nh', function()
+                require("gitsigns").nav_hunk('next', { buffer = bufnr, preview = true })
+            end)
+            -- reset hunk
+            vim.keymap.set('n', '<leader>rh', function()
+                require("gitsigns").reset_hunk()
+            end)
+        end,
+    })
 
 -- note ts_ls requires presence of package manager file:
 -- https://github.com/neovim/nvim-lspconfig/blob/master/lsp/ts_ls.lua#L61
-vim.lsp.enable({ "lua_ls", "ts_ls", "gopls" })
+vim.lsp.enable({ "lua_ls", "ts_ls", "gopls", "yamlls", "intelephense", "dockerls", "jsonls", "docker_compose_language_service", "bashls", "html"})
 require('lspconfig').intelephense.setup({
-	settings = {
-		intelephense = {
-			stubs = {
-				"apache", "bcmath", "bz2", "calendar", "com_dotnet", "Core", "ctype", "curl", "date",
-				"dba", "dom", "enchant", "exif", "FFI", "fileinfo", "filter", "fpm", "ftp", "gd",
-				"gettext", "gmp", "hash", "iconv", "imap", "intl", "json", "ldap", "libxml", "mbstring",
-				"meta", "mysqli", "oci8", "odbc", "openssl", "pcntl", "pcre", "PDO", "pdo_ibm",
-				"pdo_mysql", "pdo_pgsql", "pdo_sqlite", "pgsql", "Phar", "posix", "pspell", "readline",
-				"Reflection", "session", "shmop", "SimpleXML", "snmp", "soap", "sockets", "sodium",
-				"SPL", "sqlite3", "standard", "superglobals", "sysvmsg", "sysvsem", "sysvshm", "tidy",
-				"tokenizer", "xml", "xmlreader", "xmlrpc", "xmlwriter", "xsl", "Zend OPcache", "zip",
-				"zlib", "wordpress"
-			},
-		}
-	}
+    settings = {
+        intelephense = {
+            stubs = {
+                "apache", "bcmath", "bz2", "calendar", "com_dotnet", "Core", "ctype", "curl", "date",
+                "dba", "dom", "enchant", "exif", "FFI", "fileinfo", "filter", "fpm", "ftp", "gd",
+                "gettext", "gmp", "hash", "iconv", "imap", "intl", "json", "ldap", "libxml", "mbstring",
+                "meta", "mysqli", "oci8", "odbc", "openssl", "pcntl", "pcre", "PDO", "pdo_ibm",
+                "pdo_mysql", "pdo_pgsql", "pdo_sqlite", "pgsql", "Phar", "posix", "pspell", "readline",
+                "Reflection", "session", "shmop", "SimpleXML", "snmp", "soap", "sockets", "sodium",
+                "SPL", "sqlite3", "standard", "superglobals", "sysvmsg", "sysvsem", "sysvshm", "tidy",
+                "tokenizer", "xml", "xmlreader", "xmlrpc", "xmlwriter", "xsl", "Zend OPcache", "zip",
+                "zlib", "wordpress"
+            },
+        }
+    }
 })
 
-require'nvim-treesitter.configs'.setup {
-  sync_install = false,
-  auto_install = true,
-  ensure_installed = { "php", "lua", "javascript", "typescript", "go" },
-  highlight = {
-    enable                            = true,
-    additional_vim_regex_highlighting = false,
-  },
-  indent = {
-    enable = true,
-  },
+require 'nvim-treesitter.configs'.setup {
+    sync_install = false,
+    auto_install = true,
+    highlight = {
+        enable                            = true,
+        additional_vim_regex_highlighting = false,
+    },
+    indent = {
+        enable = true,
+    },
 }
 
 -- more keymaps
@@ -161,7 +160,7 @@ vim.keymap.set('n', '<leader>sh', ":FzfLua help_tags<CR>")
 vim.keymap.set('n', '<leader>sg', ":FzfLua live_grep_native<CR>")
 vim.keymap.set('n', 'gd',         ":FzfLua lsp_definitions<CR>")
 
-vim.keymap.set({'n', 'v'}, '<leader>lf', vim.lsp.buf.format)
+vim.keymap.set({ 'n', 'v' }, '<leader>lf', vim.lsp.buf.format)
 
 vim.keymap.set("n", "<leader>t", "<cmd>TestNearest<CR>")
 
