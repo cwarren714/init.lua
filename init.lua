@@ -172,6 +172,9 @@ vim.keymap.set('n', '<leader>pd', ':lua require("neogen").generate()<cr>')
 -- vim align keymaps
 vim.keymap.set('v', '<leader>a', '<Plug>(EasyAlign)')
 
+-- pack update
+vim.keymap.set('n', '<leader>u', ":lua vim.pack.update()<CR>")
+
 -- supermaven
 vim.keymap.set('n', '<leader>sm', function()
   local api = require('supermaven-nvim.api')
