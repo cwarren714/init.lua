@@ -79,6 +79,7 @@ vim.pack.add({
     { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
     { src = "https://github.com/danymat/neogen" },
     { src = "https://github.com/junegunn/vim-easy-align" },
+    { src = "https://github.com/supermaven-inc/supermaven-nvim" },
 })
 
 require "mini.completion".setup()
@@ -86,6 +87,7 @@ require "mini.icons".setup()
 require "netrw".setup()
 require "mason".setup()
 require "neogen".setup()
+require "supermaven-nvim".setup({})
 require "rose-pine".setup()
 require "gitsigns".setup(
     {
@@ -169,5 +171,12 @@ vim.keymap.set('n', '<leader>pd', ':lua require("neogen").generate()<cr>')
 
 -- vim align keymaps
 vim.keymap.set('v', '<leader>a', '<Plug>(EasyAlign)')
+
+-- supermaven
+vim.keymap.set('n', '<leader>sm', function()
+  local api = require('supermaven-nvim.api')
+  api.toggle(true)
+  print('Supermaven running: ' .. tostring(api.is_running()))
+end)
 
 vim.cmd("colorscheme rose-pine-moon")
