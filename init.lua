@@ -89,6 +89,7 @@ require "mason".setup()
 require "neogen".setup()
 require "supermaven-nvim".setup({})
 require "rose-pine".setup()
+require "fzf-lua".setup({ "telescope" })
 require "gitsigns".setup(
     {
         signs = {
@@ -115,7 +116,8 @@ require "gitsigns".setup(
 
 -- note ts_ls requires presence of package manager file:
 -- https://github.com/neovim/nvim-lspconfig/blob/master/lsp/ts_ls.lua#L61
-vim.lsp.enable({ "lua_ls", "ts_ls", "gopls", "yamlls", "dockerls", "jsonls", "docker_compose_language_service", "bashls", "html"})
+vim.lsp.enable({ "lua_ls", "ts_ls", "gopls", "yamlls", "dockerls", "jsonls", "docker_compose_language_service", "bashls",
+    "html" })
 require('lspconfig').intelephense.setup({
     settings = {
         intelephense = {
@@ -155,12 +157,12 @@ vim.keymap.set('n', 'gr', vim.lsp.buf.references)
 vim.keymap.set('n', 'rn', vim.lsp.buf.rename)
 
 vim.keymap.set('n', '<leader>sf', ":FzfLua files<CR>")
-vim.keymap.set('n', '<leader>/',  ":FzfLua blines<CR>")
+vim.keymap.set('n', '<leader>/', ":FzfLua blines<CR>")
 vim.keymap.set('n', '<leader>sr', ":FzfLua resume<CR>")
 vim.keymap.set('n', '<leader>sd', ":FzfLua diagnostics_document<CR>")
 vim.keymap.set('n', '<leader>sh', ":FzfLua help_tags<CR>")
 vim.keymap.set('n', '<leader>sg', ":FzfLua live_grep_native<CR>")
-vim.keymap.set('n', 'gd',         ":FzfLua lsp_definitions<CR>")
+vim.keymap.set('n', 'gd', ":FzfLua lsp_definitions<CR>")
 
 vim.keymap.set({ 'n', 'v' }, '<leader>lf', vim.lsp.buf.format)
 
@@ -177,9 +179,9 @@ vim.keymap.set('n', '<leader>u', ":lua vim.pack.update()<CR>")
 
 -- supermaven
 vim.keymap.set('n', '<leader>sm', function()
-  local api = require('supermaven-nvim.api')
-  api.toggle(true)
-  print('Supermaven running: ' .. tostring(api.is_running()))
+    local api = require('supermaven-nvim.api')
+    api.toggle(true)
+    print('Supermaven running: ' .. tostring(api.is_running()))
 end)
 
 vim.cmd("colorscheme rose-pine-moon")
