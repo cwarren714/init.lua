@@ -118,7 +118,7 @@ require "gitsigns".setup(
 -- https://github.com/neovim/nvim-lspconfig/blob/master/lsp/ts_ls.lua#L61
 vim.lsp.enable({ "lua_ls", "ts_ls", "gopls", "yamlls", "dockerls", "jsonls", "docker_compose_language_service", "bashls",
     "html", "cssls" })
-require('lspconfig').intelephense.setup({
+vim.lsp.config('intelephense', {
     settings = {
         intelephense = {
             stubs = {
