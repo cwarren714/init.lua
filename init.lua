@@ -79,8 +79,8 @@ vim.pack.add({
     { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
     { src = "https://github.com/danymat/neogen" },
     { src = "https://github.com/junegunn/vim-easy-align" },
-    { src = "https://github.com/supermaven-inc/supermaven-nvim" },
     { src = "https://github.com/OXY2DEV/markview.nvim" },
+    { src = "https://github.com/monkoose/neocodeium" },
 })
 
 require "mini.completion".setup()
@@ -88,7 +88,6 @@ require "mini.icons".setup()
 require "netrw".setup()
 require "mason".setup()
 require "neogen".setup()
-require "supermaven-nvim".setup({})
 require "rose-pine".setup()
 require "fzf-lua".setup({ "telescope" })
 require "gitsigns".setup(
@@ -119,6 +118,20 @@ require "gitsigns".setup(
 -- https://github.com/neovim/nvim-lspconfig/blob/master/lsp/ts_ls.lua#L61
 vim.lsp.enable({ "lua_ls", "ts_ls", "gopls", "yamlls", "dockerls", "jsonls", "docker_compose_language_service", "bashls",
     "html", "cssls", "marksman", "helm_ls", "intelephense" })
+
+-- wordpress interactivity lsp config and enable
+-- vim.lsp.config('wordpress-interactivity-lsp', {
+--     cmd = { 'wordpress-interactivity-lsp', '--stdio' },
+--     filetypes = { 'html', 'php' },
+--     root_markers = { 'package.json', '.git', 'composer.json' },
+-- })
+-- vim.api.nvim_create_autocmd('FileType', {
+--     pattern = { 'html', 'php' },
+--     callback = function(args)
+--         vim.lsp.enable('wordpress-interactivity-lsp')
+--     end,
+-- })
+
 
 vim.lsp.config('intelephense', {
     settings = {
@@ -156,7 +169,7 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
 
 vim.keymap.set('n', 'gd', vim.lsp.buf.type_definition)
 vim.keymap.set('n', 'gr', vim.lsp.buf.references)
-vim.keymap.set('n', 'rn', vim.lsp.buf.rename)
+vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename)
 
 vim.keymap.set('n', '<leader>sf', ":FzfLua files<CR>")
 vim.keymap.set('n', '<leader>/', ":FzfLua blines<CR>")
@@ -164,7 +177,8 @@ vim.keymap.set('n', '<leader>sr', ":FzfLua resume<CR>")
 vim.keymap.set('n', '<leader>sd', ":FzfLua diagnostics_document<CR>")
 vim.keymap.set('n', '<leader>sh', ":FzfLua help_tags<CR>")
 vim.keymap.set('n', '<leader>sg', ":FzfLua live_grep_native<CR>")
-vim.keymap.set('n', 'gd', ":FzfLua lsp_definitions<CR>")
+vim.keymap.set('n', '<leader>gd', ":FzfLua lsp_definitions<CR>")
+vim.keymap.set('n', '<leader>gr', ":FzfLua lsp_references<CR>")
 
 vim.keymap.set({ 'n', 'v' }, '<leader>lf', vim.lsp.buf.format)
 
@@ -179,11 +193,17 @@ vim.keymap.set('v', '<leader>a', '<Plug>(EasyAlign)')
 -- pack update
 vim.keymap.set('n', '<leader>u', ":lua vim.pack.update()<CR>")
 
--- supermaven
-vim.keymap.set('n', '<leader>sm', function()
-    local api = require('supermaven-nvim.api')
-    api.toggle(true)
-    print('Supermaven running: ' .. tostring(api.is_running()))
+-- neocodeium keymaps
+local nc = require("neocodeium")
+nc.setup()
+vim.keymap.set("i", "<Tab>", function()
+    nc.accept()
+end)
+vim.keymap.set("i", "<C-j>", function()
+    nc.cycle_or_complete()
+end)
+vim.keymap.set("i", "<C-k>", function()
+    nc.cycle_or_complete(-1)
 end)
 
 vim.cmd("colorscheme rose-pine-moon")
