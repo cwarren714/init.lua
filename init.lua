@@ -205,5 +205,10 @@ end)
 vim.keymap.set("i", "<C-k>", function()
     nc.cycle_or_complete(-1)
 end)
+vim.keymap.set("n", "<leader>n", function()
+    require("neocodeium.commands").toggle()
+    print("Neocodeium toggled")
+end)
+
 
 vim.cmd("colorscheme rose-pine-moon")
