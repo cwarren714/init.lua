@@ -75,12 +75,12 @@ vim.pack.add({
     { src = "https://github.com/lewis6991/gitsigns.nvim" },
     { src = "https://github.com/tpope/vim-fugitive" },
     { src = "https://github.com/vim-test/vim-test" },
-    { src = "https://github.com/rose-pine/neovim" },
+    { src = "https://github.com/serhez/teide.nvim" },
     { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
     { src = "https://github.com/danymat/neogen" },
     { src = "https://github.com/junegunn/vim-easy-align" },
     { src = "https://github.com/OXY2DEV/markview.nvim" },
-    { src = "https://github.com/monkoose/neocodeium" },
+    { src = "https://github.com/nvim-zh/colorful-winsep.nvim" },
 })
 
 require "mini.completion".setup()
@@ -88,7 +88,9 @@ require "mini.icons".setup()
 require "netrw".setup()
 require "mason".setup()
 require "neogen".setup()
-require "rose-pine".setup()
+require "colorful-winsep".setup({
+    border = "double"
+})
 require "fzf-lua".setup({ "telescope" })
 require "gitsigns".setup(
     {
@@ -117,7 +119,7 @@ require "gitsigns".setup(
 -- note ts_ls requires presence of package manager file:
 -- https://github.com/neovim/nvim-lspconfig/blob/master/lsp/ts_ls.lua#L61
 vim.lsp.enable({ "lua_ls", "ts_ls", "gopls", "yamlls", "dockerls", "jsonls", "docker_compose_language_service", "bashls",
-    "html", "cssls", "marksman", "helm_ls", "intelephense" })
+    "html", "cssls", "marksman", "helm_ls", "intelephense", "rust_analyzer" })
 
 -- wordpress interactivity lsp config and enable
 -- vim.lsp.config('wordpress-interactivity-lsp', {
@@ -193,22 +195,4 @@ vim.keymap.set('v', '<leader>a', '<Plug>(EasyAlign)')
 -- pack update
 vim.keymap.set('n', '<leader>u', ":lua vim.pack.update()<CR>")
 
--- neocodeium keymaps
-local nc = require("neocodeium")
-nc.setup()
-vim.keymap.set("i", "<Tab>", function()
-    nc.accept()
-end)
-vim.keymap.set("i", "<C-j>", function()
-    nc.cycle_or_complete()
-end)
-vim.keymap.set("i", "<C-k>", function()
-    nc.cycle_or_complete(-1)
-end)
-vim.keymap.set("n", "<leader>n", function()
-    require("neocodeium.commands").toggle()
-    print("Neocodeium toggled")
-end)
-
-
-vim.cmd("colorscheme rose-pine-moon")
+vim.cmd("colorscheme teide-darker")

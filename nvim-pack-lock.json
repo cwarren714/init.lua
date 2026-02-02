@@ -1,0 +1,68 @@
+{
+  "plugins": {
+    "colorful-winsep.nvim": {
+      "rev": "cc514e64dd9b33f56d28fbd977ebd8397892e349",
+      "src": "https://github.com/nvim-zh/colorful-winsep.nvim"
+    },
+    "fzf-lua": {
+      "rev": "ebdf24289c1d058e41fc9eb07deba3626d55a5ce",
+      "src": "https://github.com/ibhagwan/fzf-lua"
+    },
+    "gitsigns.nvim": {
+      "rev": "f780609807eca1f783a36a8a31c30a48fbe150c5",
+      "src": "https://github.com/lewis6991/gitsigns.nvim"
+    },
+    "markview.nvim": {
+      "rev": "c93ea99d96b4bfda5b7c7d0dfca9c26edf6e78f0",
+      "src": "https://github.com/OXY2DEV/markview.nvim"
+    },
+    "mason.nvim": {
+      "rev": "7dc4facca9702f95353d5a1f87daf23d78e31c2a",
+      "src": "https://github.com/mason-org/mason.nvim"
+    },
+    "mini.completion": {
+      "rev": "3009e3508209657aaa459b1753597f4a5eb5c684",
+      "src": "https://github.com/nvim-mini/mini.completion"
+    },
+    "mini.icons": {
+      "rev": "f9a177c11daa7829389b7b6eaaec8b8a5c47052d",
+      "src": "https://github.com/nvim-mini/mini.icons"
+    },
+    "neogen": {
+      "rev": "d7f9461727751fb07f82011051338a9aba07581d",
+      "src": "https://github.com/danymat/neogen"
+    },
+    "neovim": {
+      "rev": "72a04c4065345b51b56aed4859ea1d884f734097",
+      "src": "https://github.com/rose-pine/neovim"
+    },
+    "netrw.nvim": {
+      "rev": "90501c62b9b816ed3ed1e912ae9db9af5671a1b2",
+      "src": "https://github.com/prichrd/netrw.nvim"
+    },
+    "nvim-lspconfig": {
+      "rev": "d9879110d0422a566fa01d732556f4d5515e1738",
+      "src": "https://github.com/neovim/nvim-lspconfig"
+    },
+    "nvim-treesitter": {
+      "rev": "42fc28ba918343ebfd5565147a42a26580579482",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter"
+    },
+    "teide.nvim": {
+      "rev": "95041d1d78e786bd88be64bca3e1771f7b6236df",
+      "src": "https://github.com/serhez/teide.nvim"
+    },
+    "vim-easy-align": {
+      "rev": "9815a55dbcd817784458df7a18acacc6f82b1241",
+      "src": "https://github.com/junegunn/vim-easy-align"
+    },
+    "vim-fugitive": {
+      "rev": "61b51c09b7c9ce04e821f6cf76ea4f6f903e3cf4",
+      "src": "https://github.com/tpope/vim-fugitive"
+    },
+    "vim-test": {
+      "rev": "5ee3c0b3734eab612b9f70bbc8a4f69f17f8e8ef",
+      "src": "https://github.com/vim-test/vim-test"
+    }
+  }
+}
