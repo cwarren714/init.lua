@@ -14,6 +14,7 @@ vim.o.expandtab = true
 vim.o.winborder = "rounded"
 vim.o.smartcase = true
 vim.o.ignorecase = true
+vim.cmd.colorscheme('catppuccin')
 
 -- shout out
 vim.keymap.set('n', '<leader>o', ':update<CR> :source<CR>')
@@ -74,10 +75,8 @@ vim.pack.add({
     { src = "https://github.com/mason-org/mason.nvim" },
     { src = "https://github.com/lewis6991/gitsigns.nvim" },
     { src = "https://github.com/tpope/vim-fugitive" },
-    { src = "https://github.com/vim-test/vim-test" },
-    { src = "https://github.com/serhez/teide.nvim" },
     { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
-    { src = "https://github.com/danymat/neogen" },
+    { src = "https://github.com/vim-test/vim-test" },
     { src = "https://github.com/junegunn/vim-easy-align" },
     { src = "https://github.com/OXY2DEV/markview.nvim" },
     { src = "https://github.com/nvim-zh/colorful-winsep.nvim" },
@@ -87,7 +86,6 @@ require "mini.completion".setup()
 require "mini.icons".setup()
 require "netrw".setup()
 require "mason".setup()
-require "neogen".setup()
 require "colorful-winsep".setup({
     border = "double"
 })
@@ -121,20 +119,6 @@ require "gitsigns".setup(
 vim.lsp.enable({ "lua_ls", "ts_ls", "gopls", "yamlls", "dockerls", "jsonls", "docker_compose_language_service", "bashls",
     "html", "cssls", "marksman", "helm_ls", "intelephense", "rust_analyzer" })
 
--- wordpress interactivity lsp config and enable
--- vim.lsp.config('wordpress-interactivity-lsp', {
---     cmd = { 'wordpress-interactivity-lsp', '--stdio' },
---     filetypes = { 'html', 'php' },
---     root_markers = { 'package.json', '.git', 'composer.json' },
--- })
--- vim.api.nvim_create_autocmd('FileType', {
---     pattern = { 'html', 'php' },
---     callback = function(args)
---         vim.lsp.enable('wordpress-interactivity-lsp')
---     end,
--- })
-
-
 vim.lsp.config('intelephense', {
     settings = {
         intelephense = {
@@ -153,23 +137,27 @@ vim.lsp.config('intelephense', {
     }
 })
 
-require 'nvim-treesitter.configs'.setup {
-    sync_install = false,
-    auto_install = true,
-    highlight = {
-        enable                            = true,
-        additional_vim_regex_highlighting = false,
-    },
-    indent = {
-        enable = true,
-    },
-}
+-- auto install treesitter parsers for the file type
+-- using nvim-treesitter for ^0.12.0
+vim.api.nvim_create_autocmd('FileType', {
+    callback = function(ev)
+        local ts = require('nvim-treesitter')
+        local lang = vim.treesitter.language.get_lang(ev.match)
+        if not lang or not vim.tbl_contains(ts.get_available(), lang) then return end
+        if not vim.tbl_contains(ts.get_installed(), lang) then
+            ts.install(lang):wait()
+        end
+        vim.treesitter.start()
+        ts.indentexpr()
+    end,
+})
 
 -- more keymaps
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
 
-vim.keymap.set('n', 'gd', vim.lsp.buf.type_definition)
+vim.keymap.set('n', 'gd', vim.lsp.buf.definition)
+vim.keymap.set('n', 'gD', vim.lsp.buf.type_definition)
 vim.keymap.set('n', 'gr', vim.lsp.buf.references)
 vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename)
 
@@ -186,13 +174,9 @@ vim.keymap.set({ 'n', 'v' }, '<leader>lf', vim.lsp.buf.format)
 
 vim.keymap.set("n", "<leader>t", "<cmd>TestNearest<CR>")
 
--- annotation like phpdoc
-vim.keymap.set('n', '<leader>pd', ':lua require("neogen").generate()<cr>')
-
 -- vim align keymaps
 vim.keymap.set('v', '<leader>a', '<Plug>(EasyAlign)')
 
 -- pack update
 vim.keymap.set('n', '<leader>u', ":lua vim.pack.update()<CR>")
 
-vim.cmd("colorscheme teide-darker")

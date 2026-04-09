@@ -1,5 +1,9 @@
 {
   "plugins": {
+    "blink.cmp": {
+      "rev": "6323a6ddb191323904557dc9b545f309ea2b0e12",
+      "src": "https://github.com/saghen/blink.cmp"
+    },
     "colorful-winsep.nvim": {
       "rev": "cc514e64dd9b33f56d28fbd977ebd8397892e349",
       "src": "https://github.com/nvim-zh/colorful-winsep.nvim"
@@ -28,6 +32,14 @@
       "rev": "f9a177c11daa7829389b7b6eaaec8b8a5c47052d",
       "src": "https://github.com/nvim-mini/mini.icons"
     },
+    "mini.pick": {
+      "rev": "be6490ae9d7038b9f5185d95a8060054f9b23666",
+      "src": "https://github.com/nvim-mini/mini.pick"
+    },
+    "neocodeium": {
+      "rev": "bfe790d78e66adaa95cb50a8c75c64a752336e9c",
+      "src": "https://github.com/monkoose/neocodeium"
+    },
     "neogen": {
       "rev": "d7f9461727751fb07f82011051338a9aba07581d",
       "src": "https://github.com/danymat/neogen"
@@ -47,6 +59,10 @@
     "nvim-treesitter": {
       "rev": "42fc28ba918343ebfd5565147a42a26580579482",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter"
+    },
+    "supermaven-nvim": {
+      "rev": "07d20fce48a5629686aefb0a7cd4b25e33947d50",
+      "src": "https://github.com/supermaven-inc/supermaven-nvim"
     },
     "teide.nvim": {
       "rev": "95041d1d78e786bd88be64bca3e1771f7b6236df",
