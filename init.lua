@@ -75,20 +75,17 @@ vim.pack.add({
     { src = "https://github.com/mason-org/mason.nvim" },
     { src = "https://github.com/lewis6991/gitsigns.nvim" },
     { src = "https://github.com/tpope/vim-fugitive" },
-    { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
     { src = "https://github.com/vim-test/vim-test" },
     { src = "https://github.com/junegunn/vim-easy-align" },
     { src = "https://github.com/OXY2DEV/markview.nvim" },
-    { src = "https://github.com/nvim-zh/colorful-winsep.nvim" },
+    { src = "https://github.com/cwarren714/timber" },
 })
 
 require "mini.completion".setup()
 require "mini.icons".setup()
 require "netrw".setup()
 require "mason".setup()
-require "colorful-winsep".setup({
-    border = "double"
-})
+require "timber".setup()
 require "fzf-lua".setup({ "telescope" })
 require "gitsigns".setup(
     {
@@ -137,21 +134,6 @@ vim.lsp.config('intelephense', {
     }
 })
 
--- auto install treesitter parsers for the file type
--- using nvim-treesitter for ^0.12.0
-vim.api.nvim_create_autocmd('FileType', {
-    callback = function(ev)
-        local ts = require('nvim-treesitter')
-        local lang = vim.treesitter.language.get_lang(ev.match)
-        if not lang or not vim.tbl_contains(ts.get_available(), lang) then return end
-        if not vim.tbl_contains(ts.get_installed(), lang) then
-            ts.install(lang):wait()
-        end
-        vim.treesitter.start()
-        ts.indentexpr()
-    end,
-})
-
 -- more keymaps
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
@@ -179,4 +161,3 @@ vim.keymap.set('v', '<leader>a', '<Plug>(EasyAlign)')
 
 -- pack update
 vim.keymap.set('n', '<leader>u', ":lua vim.pack.update()<CR>")
-
