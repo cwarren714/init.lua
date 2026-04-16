@@ -160,4 +160,4 @@ vim.keymap.set("n", "<leader>t", "<cmd>TestNearest<CR>")
 vim.keymap.set('v', '<leader>a', '<Plug>(EasyAlign)')
 
 -- pack update
-vim.keymap.set('n', '<leader>u', ":lua vim.pack.update()<CR>")
+vim.keymap.set('n', '<leader>u', ":lua vim.pack.update(nil, {force = true})<CR>")
