@@ -59,6 +59,9 @@ vim.keymap.set('n', '<leader>;', '<esc>A;<esc>')
 -- ctrl + s to save like a savage
 vim.keymap.set('n', '<C-s>', '<esc>:w<CR>')
 
+-- toggle spell check for current buffer
+vim.keymap.set('n', '<leader>ts', '<cmd>setlocal spell!<CR>')
+
 -- quickfix navigation
 vim.keymap.set('n', '<C-N>', ':cnext<CR>')
 vim.keymap.set('n', '<C-P>', ':cprev<CR>')
