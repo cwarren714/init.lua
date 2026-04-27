@@ -81,14 +81,13 @@ vim.pack.add({
     { src = "https://github.com/vim-test/vim-test" },
     { src = "https://github.com/junegunn/vim-easy-align" },
     { src = "https://github.com/OXY2DEV/markview.nvim" },
-    { src = "https://github.com/cwarren714/timber" },
+    { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
 })
 
 require "mini.completion".setup()
 require "mini.icons".setup()
 require "netrw".setup()
 require "mason".setup()
-require "timber".setup()
 require "fzf-lua".setup({ "telescope" })
 require "gitsigns".setup(
     {
@@ -137,6 +136,15 @@ vim.lsp.config('intelephense', {
     }
 })
 
+require('nvim-treesitter').install { 'php', 'phpdoc', 'javascript', 'html', 'css', 'go', 'typescript', 'markdown', 'dockerfile', 'yaml', 'lua' }
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'php', 'javascript', 'html', 'css', 'go', 'typescript', 'markdown', 'dockerfile', 'yaml', 'lua' },
+  callback = function(args)
+    pcall(vim.treesitter.start, args.buf)
+  end,
+})
+
 -- more keymaps
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
@@ -164,3 +172,6 @@ vim.keymap.set('v', '<leader>a', '<Plug>(EasyAlign)')
 
 -- pack update
 vim.keymap.set('n', '<leader>u', ":lua vim.pack.update(nil, {force = true})<CR>")
+
+-- lsp info
+vim.keymap.set('n', '<leader>l', ":checkhealth vim.lsp<CR>")

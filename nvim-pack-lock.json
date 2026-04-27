@@ -1,7 +1,7 @@
 {
   "plugins": {
     "blink.cmp": {
-      "rev": "c573a15a62bd0bfd4006ee0849b24f5404395500",
+      "rev": "90d14caca4ae557665ab105080c27d5f289a2e30",
       "src": "https://github.com/saghen/blink.cmp"
     },
     "colorful-winsep.nvim": {
@@ -9,15 +9,15 @@
       "src": "https://github.com/nvim-zh/colorful-winsep.nvim"
     },
     "fzf-lua": {
-      "rev": "69b0d5d045cc039e68ba4c82190ce471464226b6",
+      "rev": "c27c398ef84f3a98185623764ba4793758b68952",
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
     "gitsigns.nvim": {
-      "rev": "8d82c240f190fc33723d48c308ccc1ed8baad69d",
+      "rev": "6d808f99bd63303646794406e270bd553ad7792e",
       "src": "https://github.com/lewis6991/gitsigns.nvim"
     },
     "markview.nvim": {
-      "rev": "5a890277ba7edd7823d20f4d0525132d277aea9a",
+      "rev": "e27dee8b2a61f89ac3a06deae0264ad1d3f7b62c",
       "src": "https://github.com/OXY2DEV/markview.nvim"
     },
     "mason.nvim": {
@@ -25,7 +25,7 @@
       "src": "https://github.com/mason-org/mason.nvim"
     },
     "mini.completion": {
-      "rev": "ffbdb06d2fa6a3fcef3891108bb38e33223b27a7",
+      "rev": "e934b46f6471a3bd0cd37fc06d0df198b9711882",
       "src": "https://github.com/nvim-mini/mini.completion"
     },
     "mini.icons": {
@@ -53,12 +53,20 @@
       "src": "https://github.com/prichrd/netrw.nvim"
     },
     "nvim-lspconfig": {
-      "rev": "4b7fbaa239c5db6b36f424a4521ca9f1a401be33",
+      "rev": "e05fb8c3bd61d909dacff24f77f23beb644daf54",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "nvim-treesitter": {
       "rev": "cf12346a3414fa1b06af75c79faebe7f76df080a",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter"
+    },
+    "sonarlint.nvim": {
+      "rev": "acd09b78969ddc965a7ddf59abb9d9eec5ecd94f",
+      "src": "https://gitlab.com/schrieveslaach/sonarlint.nvim"
+    },
+    "sonarqube.nvim": {
+      "rev": "811bf8f46e0aa5ed9c9b5783aaf6f87640df553a",
+      "src": "https://github.com/iamkarasik/sonarqube.nvim"
     },
     "supermaven-nvim": {
       "rev": "07d20fce48a5629686aefb0a7cd4b25e33947d50",
@@ -69,11 +77,11 @@
       "src": "https://github.com/serhez/teide.nvim"
     },
     "timber": {
-      "rev": "28d65b9a43aeeb12080376d96df6b3b10b13bf6b",
+      "rev": "9b23c47f4890d9ad223fb3de9a1fee24621db6d6",
       "src": "https://github.com/cwarren714/timber"
     },
     "timber.bak-20260415-075934": {
-      "rev": "28d65b9a43aeeb12080376d96df6b3b10b13bf6b",
+      "rev": "9b23c47f4890d9ad223fb3de9a1fee24621db6d6",
       "src": "https://github.com/cwarren714/timber"
     },
     "vim-easy-align": {
