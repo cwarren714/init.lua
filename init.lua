@@ -112,8 +112,6 @@ require "gitsigns".setup(
         end,
     })
 
--- note ts_ls requires presence of package manager file:
--- https://github.com/neovim/nvim-lspconfig/blob/master/lsp/ts_ls.lua#L61
 vim.lsp.enable({ "lua_ls", "ts_ls", "gopls", "yamlls", "dockerls", "jsonls", "docker_compose_language_service", "bashls",
     "html", "cssls", "marksman", "helm_ls", "intelephense", "rust_analyzer" })
 
@@ -135,7 +133,7 @@ vim.lsp.config('intelephense', {
     }
 })
 
-require('nvim-treesitter').install { 'php', 'phpdoc', 'javascript', 'html', 'css', 'go', 'typescript', 'markdown', 'dockerfile', 'yaml', 'lua' }
+require('nvim-treesitter').install { 'php', 'phpdoc', 'javascript', 'html', 'css', 'go', 'typescript', 'markdown', 'dockerfile', 'yaml', 'lua', 'json', 'helm'}
 
 -- start treesitter for common filetypes and set indent to use treesitteer
 vim.api.nvim_create_autocmd('FileType', {
