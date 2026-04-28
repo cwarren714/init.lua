@@ -14,7 +14,6 @@ vim.o.expandtab = true
 vim.o.winborder = "rounded"
 vim.o.smartcase = true
 vim.o.ignorecase = true
-vim.cmd.colorscheme('catppuccin')
 
 -- shout out
 vim.keymap.set('n', '<leader>o', ':update<CR> :source<CR>')
@@ -138,10 +137,12 @@ vim.lsp.config('intelephense', {
 
 require('nvim-treesitter').install { 'php', 'phpdoc', 'javascript', 'html', 'css', 'go', 'typescript', 'markdown', 'dockerfile', 'yaml', 'lua' }
 
+-- start treesitter for common filetypes and set indent to use treesitteer
 vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'php', 'javascript', 'html', 'css', 'go', 'typescript', 'markdown', 'dockerfile', 'yaml', 'lua' },
   callback = function(args)
     pcall(vim.treesitter.start, args.buf)
+    vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
   end,
 })
 
@@ -174,4 +175,4 @@ vim.keymap.set('v', '<leader>a', '<Plug>(EasyAlign)')
 vim.keymap.set('n', '<leader>u', ":lua vim.pack.update(nil, {force = true})<CR>")
 
 -- lsp info
-vim.keymap.set('n', '<leader>l', ":checkhealth vim.lsp<CR>")
+vim.keymap.set('n', '<leader>ls', ":checkhealth vim.lsp<CR>")
