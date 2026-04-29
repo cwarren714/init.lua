@@ -14,6 +14,7 @@ vim.o.expandtab = true
 vim.o.winborder = "rounded"
 vim.o.smartcase = true
 vim.o.ignorecase = true
+vim.cmd.colorscheme('elflord')
 
 -- shout out
 vim.keymap.set('n', '<leader>o', ':update<CR> :source<CR>')
@@ -81,8 +82,10 @@ vim.pack.add({
     { src = "https://github.com/junegunn/vim-easy-align" },
     { src = "https://github.com/OXY2DEV/markview.nvim" },
     { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
+    { src = "https://github.com/numtostr/comment.nvim" },
 })
 
+require "Comment".setup()
 require "mini.completion".setup()
 require "mini.icons".setup()
 require "netrw".setup()

@@ -1,5 +1,9 @@
 {
   "plugins": {
+    "Comment.nvim": {
+      "rev": "e30b7f2008e52442154b66f7c519bfd2f1e32acb",
+      "src": "https://github.com/numToStr/Comment.nvim"
+    },
     "blink.cmp": {
       "rev": "03c11da4349d44ea582c363bc9c75fe0b3a5d2ef",
       "src": "https://github.com/saghen/blink.cmp"
@@ -7,6 +11,10 @@
     "colorful-winsep.nvim": {
       "rev": "6134b5cd4a38990c7b720adc90973ed32f726179",
       "src": "https://github.com/nvim-zh/colorful-winsep.nvim"
+    },
+    "comment.nvim": {
+      "rev": "e30b7f2008e52442154b66f7c519bfd2f1e32acb",
+      "src": "https://github.com/numtostr/comment.nvim"
     },
     "fzf-lua": {
       "rev": "2e29d5f233defe3c5587df0e4dd29af2bd95a5a7",
@@ -23,6 +31,10 @@
     "mason.nvim": {
       "rev": "cb8445f8ce85d957416c106b780efd51c6298f89",
       "src": "https://github.com/mason-org/mason.nvim"
+    },
+    "mini.comment": {
+      "rev": "8e5ff3ed3cc0e8f216617aae01020c00c20f7a87",
+      "src": "https://github.com/nvim-mini/mini.comment"
     },
     "mini.completion": {
       "rev": "667d94669be66043123cac44e7c5d65a31657732",
